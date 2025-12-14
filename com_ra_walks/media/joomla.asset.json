@@ -1,16 +1,16 @@
 {
   "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
-  "name": "com_ra_wf",
+  "name": "com_ra_walks",
   "version": "CVS: 4.0.0",
   "license": "GNU General Public License version 2 or later; see LICENSE.txt",
   "assets": [
     {
-      "name": "com_ra_wf.admin",
+      "name": "com_ra_walks.admin",
       "type": "style",
-      "uri": "com_ra_wf/admin.css"
+      "uri": "com_ra_walks/admin.css"
     },
     {
-      "name": "com_ra_wf.admin",
+      "name": "com_ra_walks.admin",
       "type": "script",
       "uri": "com_ra_wf/admin.js",
       "dependencies": [
@@ -21,9 +21,9 @@
       }
     },
     {
-        "name": "com_ra_wf.list",
+        "name": "com_ra_walks.list",
         "type": "style",
-        "uri": "com_ra_wf/list.css"
+        "uri": "com_ra_walks/list.css"
     }
   ]
 }
