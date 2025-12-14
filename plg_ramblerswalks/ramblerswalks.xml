@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--~
+  ~ @package   com_ra_walks
+  ~ @copyright Copyright (c)2006-2023 Charlie Bigley / Ramblers
+  ~ @license   GNU General Public License version 3, or later
+  -->
+
+<extension type="plugin" group="console" method="upgrade">
+	<name>plg_system_ramblerswalks</name>
+	<description>Ramblers plugin to copy walks from WalksManager</description>
+	<version>1.0.9</version>
+	<creationDate>9 Jan 2025</creationDate>
+	<author>Charlie Bigley</author>
+    <authorEmail>webmaster@bigley.me.uk</authorEmail>
+    <authorUrl>staffordshireramblers.org.uk</authorUrl>
+	<copyright>Copyleft 2024 Charlie Bigley</copyright>
+	<license>GNU General Public License version 3, or later</license>	
+	<namespace path="src">Ramblers\Plugin\System\Ramblerswalks</namespace>
+	<files>
+		<filename plugin="ramblerswalks">ramblerswalks.php</filename>
+		<folder>services</folder>
+		<folder>src</folder>
+	</files>
+</extension>
