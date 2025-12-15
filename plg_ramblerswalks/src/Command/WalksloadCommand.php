@@ -6,7 +6,7 @@
  *
  * @copyright   Copyright (C) 2005 - 2021 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
- * 11/12/24 CB created from OnoffbydateCommand
+ * 11/12/24 CB created from OnoffbydateCommand, Clifford Ford
  * 17/12/24 CB return 1 from doExecute
  * 05/01/25 CB incorporate code from LoadHelper
  * 07/01/25 CB allow to run in two parts

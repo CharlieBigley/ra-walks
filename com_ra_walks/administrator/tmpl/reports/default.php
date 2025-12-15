@@ -1,6 +1,6 @@
 <?php
 /**
- * @version     1.0.7
+ * @version     1.1.1
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -12,29 +12,23 @@
  * 06/02/23 CB mailman report
  * 23/06/23 CB remove mailman reports again
  * 14/12/24 CB showLogfile
+ * 15/12/25 CB walks by month
  */
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Toolbar\Toolbar;
-use Joomla\CMS\Toolbar\ToolbarHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
-echo "<!-- Code from ' . __FILE__ . ' -->" . PHP_EOL;
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 $objTable = new ToolsTable();
 ToolBarHelper::title('Walks reports');
 
 // Import CSS
 $this->wa = $this->document->getWebAssetManager();
 $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
-;
 
 //echo __file__ . '<br>';
 //var_dump($this->params);
@@ -50,37 +44,38 @@ $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
         $objTable->width = 30;
         $objTable->add_header('Report,Action', 'grey');
 
+        $objTable->add_item("Show Walks by Month");
+        $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showWalksByMonth", "Go", False, 'red'));
+        $objTable->add_item("");
+        $objTable->generate_line();
+
         $objTable->add_item("Show Logfile");
-        $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showLogfile", "Go", False, 'red'));
+        $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showLogfile", "Go", False, 'red'));
         $objTable->add_item("");
         $objTable->generate_line();
 
         if (ComponentHelper::isEnabled('com_ra_wf', true)) {
             $objTable->add_item("Count Users");
-            $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.countUsers", "Go", False, 'red'));
+            $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.countUsers", "Go", False, 'red'));
             $objTable->add_item("");
             $objTable->generate_line();
 
             $objTable->add_item("Show Users");
-            $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showUsers", "Go", False, 'red'));
+            $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showUsers", "Go", False, 'red'));
             $objTable->add_item("");
             $objTable->generate_line();
 
-            // index.php?option=com_ra_tools&task=reports.showColours
-
             $objTable->add_item("Show Followers");
-            $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showFollowers", "Go", False, 'red'));
+            $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showFollowers", "Go", False, 'red'));
             $objTable->generate_line();
         }
 
         $objTable->generate_table();
         $target = 'administrator/index.php?option=com_ra_tools&view=dashboard';
-        echo $objHelper->backButton($target);
+        echo $toolsHelper->backButton($target);
         ?>
         <input type="hidden" name="task" value="" />
         <?php echo JHtml::_('form.token'); ?>
     </div>
 </div>
 </form>
-<?php
-echo "<!-- End of code from ' . __file . ' -->" . PHP_EOL;
