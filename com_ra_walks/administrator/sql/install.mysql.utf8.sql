@@ -85,13 +85,3 @@ CREATE TABLE IF NOT EXISTS `#__ra_walks_audit` (
   KEY `object_id` (`object_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 # ------------------------------------------------------------------------------
-DROP TABLE IF EXISTS `#__ra_logfile`;
-CREATE TABLE `#__ra_logfile` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `record_type` char(2) NOT NULL,
-  `ref` varchar(10) DEFAULT NULL,
-  `message` mediumtext CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
-# ------------------------------------------------------------------------------
