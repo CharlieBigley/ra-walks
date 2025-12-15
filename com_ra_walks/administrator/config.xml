@@ -5,17 +5,10 @@
                type="radio" 
                default="0" 
                label="Specify walks to be loaded from WalksManager">                               
-            <option value="0">All walks</option>
-            <option value="1">A single Area</option>
-        </field>  
-        <field name="area" 
-               type="text" 
-               default="NS" 
-               size="2" 
-               label="Area code" 
-               description="Two character code for the required Area" 
-               showon="option:1"
-        />                 
+            <option value="0">Default Group only (from com_ra_tools Config)</option>
+            <option value="1">Default Area</option>
+            <option value="2">All walks</option>
+        </field>            
     </fieldset>
 
     <fieldset name="permissions" description="JCONFIG_PERMISSIONS_DESC" label="JCONFIG_PERMISSIONS_LABEL">

@@ -1,4 +1,3 @@
-
 <?php
 
 /**
@@ -13,6 +12,7 @@
  * 07/01/25 CB allow to run in two parts
  * 09/01/25 CB three parts
  * 13/01/25 CB change logging
+ * 15/12/25 CB support three modes of execution
  */
 
 namespace Ramblers\Plugin\System\Ramblerswalks\Command;
@@ -58,7 +58,7 @@ class WalksloadCommand extends AbstractCommand {
     private $ioStyle;
     protected $db;
     protected $app;
-    protected $objHelper;
+    protected $toolsHelper;
     private $part;
     private $walksfound = 0;
     private $walksupdated = 0;
@@ -73,7 +73,7 @@ class WalksloadCommand extends AbstractCommand {
     public function __construct() {
         parent::__construct();
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
         $this->app = Factory::getApplication();
     }
 
@@ -135,37 +135,47 @@ class WalksloadCommand extends AbstractCommand {
           }
          *
          */
-        $message = 'WalksRefresh started in batch mode';
+        $message = 'WalksRefresh started in batch mode (' . $this->part . ')';
 
-        $params = ComponentHelper::getParams('com_ra_walks');
-        $option = $params->get('option');
-        $sql .= 'SELECT code from #__ra_areas ';
+        $walks_params = ComponentHelper::getParams('com_ra_walks');
+        $walks_option = $walks_params->get('option');
         /*
-          if ($option == '1') {
-          $code = $params->get('area');
-          $message .= ' for Area ' . $code;
-          $sql .= 'WHERE code="' . $code . '"';
-          } else {
-          $message .= ' for all Areas';
-          }
+         * option=0, walks for home group
+         * option=1, walks for home area
+         * option=2, all walks
          */
-
-        if ($this->part == '1') {
-            $sql .= 'WHERE code<"I"';
-            $message .= ' for Areas < I';
-        } elseif ($this->part == '2') {
-            $sql .= 'WHERE code>"I" AND code<"R"';
-            $message .= ' for Areas > I AND < R ';
+        if ($walks_option == '2') {
+            $sql .= 'SELECT code from #__ra_areas ';
+            if ($this->part == '1') {
+                $sql .= 'WHERE code<"I"';
+                $message .= ' for Areas < I';
+            } elseif ($this->part == '2') {
+                $sql .= 'WHERE code>"I" AND code<"R"';
+                $message .= ' for Areas > I AND < R ';
+            } else {
+                $sql .= 'WHERE code>"R"';
+                $message .= ' for Areas > R';
+            }
+            $sql .= ' ORDER BY code ';
         } else {
-            $sql .= 'WHERE code>"R"';
-            $message .= ' for Areas > R';
+            $tools_params = ComponentHelper::getParams('com_ra_tools');
+            $default_group = $tools_params->get('default_group');
+            if ($walks_option == '1') {
+                $sql .= 'SELECT code from #__ra_areas ';
+                $sql .= 'WHERE code="' . substr($default_group, 0, 2) . '" ';
+                $message .= ' for Area ' . substr($default_group, 0, 2);
+                $sql .= ' ORDER BY code ';
+            } else {
+                $sql .= 'SELECT code from #__ra_groups ';
+                $sql .= 'WHERE code="' . $default_group . '" ';
+                $message .= ' for local Group ' . $default_group;
+            }
         }
-        $sql .= ' ORDER BY code ';
 
         $this->ioStyle->comment($message);
         $this->logit($message, '1');
-//        $this->ioStyle->comment($sql);
-        $rows = $this->objHelper->getRows($sql);
+        $this->ioStyle->comment($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $message = 'Processing ' . $row->code . ' ';
             $walkslist = $this->getWalksData($row->code);
