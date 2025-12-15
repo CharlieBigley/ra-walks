@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+    <layout title="View a single Walk" option="View">
+        <message>
+                        <![CDATA[View a single walks]]>
+        </message>
+    </layout>
+    <fields name="request">
+        <fieldset 
+            name="request"
+            label="COM_RA_WALKS_FIELDSET_ITEM_ID_SELECT_LABEL">
+            <field
+                name="id"
+                query="SELECT `id`, `id` FROM #__ra_walks ORDER BY `id`"
+                type="sql"
+                key_field="id" 
+                value_field="id"
+                label="COM_RA_WALKS_ITEM_ID_SELECT_LABEL"
+                require="true"
+                description="JGLOBAL_SHOW_TITLE_DESC">
+            </field>
+        </fieldset>
+    </fields>
+</metadata>

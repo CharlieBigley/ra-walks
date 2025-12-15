@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form addfieldprefix="Ramblers\Component\Ra_walks\Site\Field">
+  <fieldset>
+    <field name="id" type="text" readonly="true" class="readonly" default="0" description="JGLOBAL_FIELD_ID_DESC"/>
+    <field name="state" default="1" type="list" label="JSTATUS" description="JFIELD_PUBLISHED_DESC" class="inputbox" size="1">
+      <option value="1">JPUBLISHED</option>
+      <option value="0">JUNPUBLISHED</option>
+      <option value="2">JARCHIVED</option>
+      <option value="-2">JTRASHED</option>
+    </field>
+    <field name="ordering"/>
+    <field name="checked_out" type="hidden" filter="unset"/>
+    <field name="checked_out_time" type="hidden" filter="unset"/>
+    <field name="walk_id" label="COM_RA_WALKS_FORM_LBL_WALK_WALK_ID" description="COM_RA_WALKS_FORM_DESC_WALK_WALK_ID" hint="COM_RA_WALKS_FORM_LBL_WALK_WALK_ID"/>
+    <field name="walk_date" default="0000-00-00" type="calendar" class="inputbox" filter="safehtml" label="COM_RA_WALKS_FORM_LBL_WALK_WALK_DATE" description="COM_RA_WALKS_FORM_DESC_WALK_WALK_DATE" hint="COM_RA_WALKS_FORM_LBL_WALK_WALK_DATE"/>
+    <field name="group_code" label="COM_RA_WALKS_FORM_LBL_WALK_GROUP_CODE" description="COM_RA_WALKS_FORM_DESC_WALK_GROUP_CODE" hint="COM_RA_WALKS_FORM_LBL_WALK_GROUP_CODE"/>
+    <field name="title" default="120" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" hint="COM_RA_WALKS_FORM_LBL_WALK_TITLE"/>
+    <field name="contact_display_name" label="COM_RA_WALKS_FORM_LBL_WALK_CONTACT_DISPLAY_NAME" description="COM_RA_WALKS_FORM_DESC_WALK_CONTACT_DISPLAY_NAME" hint="COM_RA_WALKS_FORM_LBL_WALK_CONTACT_DISPLAY_NAME"/>
+    <field name="distance_miles" label="COM_RA_WALKS_FORM_LBL_WALK_DISTANCE_MILES" description="COM_RA_WALKS_FORM_DESC_WALK_DISTANCE_MILES" hint="COM_RA_WALKS_FORM_LBL_WALK_DISTANCE_MILES"/>
+    <field name="start_time" label="COM_RA_WALKS_FORM_LBL_WALK_START_TIME" description="COM_RA_WALKS_FORM_DESC_WALK_START_TIME" hint="COM_RA_WALKS_FORM_LBL_WALK_START_TIME"/>
+    <field name="distance_km" label="COM_RA_WALKS_FORM_LBL_WALK_DISTANCE_KM" description="COM_RA_WALKS_FORM_DESC_WALK_DISTANCE_KM" hint="COM_RA_WALKS_FORM_LBL_WALK_DISTANCE_KM"/>
+    <field name="start_details" type="editor" buttons="true" class="inputbox" filter="safehtml" label="COM_RA_WALKS_FORM_LBL_WALK_START_DETAILS" description="COM_RA_WALKS_FORM_DESC_WALK_START_DETAILS" hint="COM_RA_WALKS_FORM_LBL_WALK_START_DETAILS"/>
+    <field name="difficulty" label="COM_RA_WALKS_FORM_LBL_WALK_DIFFICULTY" description="COM_RA_WALKS_FORM_DESC_WALK_DIFFICULTY" hint="COM_RA_WALKS_FORM_LBL_WALK_DIFFICULTY"/>
+    <field name="description" type="editor" buttons="true" class="inputbox" filter="safehtml" label="COM_RA_WALKS_FORM_LBL_WALK_DESCRIPTION" description="COM_RA_WALKS_FORM_DESC_WALK_DESCRIPTION" hint="COM_RA_WALKS_FORM_LBL_WALK_DESCRIPTION"/>
+    <field name="start_postcode" label="COM_RA_WALKS_FORM_LBL_WALK_START_POSTCODE" description="COM_RA_WALKS_FORM_DESC_WALK_START_POSTCODE" hint="COM_RA_WALKS_FORM_LBL_WALK_START_POSTCODE"/>
+    <field name="start_longitude" label="COM_RA_WALKS_FORM_LBL_WALK_START_LONGITUDE" description="COM_RA_WALKS_FORM_DESC_WALK_START_LONGITUDE" hint="COM_RA_WALKS_FORM_LBL_WALK_START_LONGITUDE"/>
+    <field name="start_latitude" label="COM_RA_WALKS_FORM_LBL_WALK_START_LATITUDE" description="COM_RA_WALKS_FORM_DESC_WALK_START_LATITUDE" hint="COM_RA_WALKS_FORM_LBL_WALK_START_LATITUDE"/>
+    <field name="start_gridref" label="COM_RA_WALKS_FORM_LBL_WALK_START_GRIDREF" description="COM_RA_WALKS_FORM_DESC_WALK_START_GRIDREF" hint="COM_RA_WALKS_FORM_LBL_WALK_START_GRIDREF"/>
+    <field name="version_note" type="text" label="JGLOBAL_FIELD_VERSION_NOTE_LABEL" description="JGLOBAL_FIELD_VERSION_NOTE_DESC" class="inputbox" size="45" labelclass="control-label"/>
+  </fieldset>
+</form>

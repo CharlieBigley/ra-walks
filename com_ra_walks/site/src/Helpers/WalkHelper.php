@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Common functions to support Walks
+ * Utilities to support Walks
  *
  * @author charles
  *  * 06/12/22 CB created from com_ramblers
@@ -11,7 +11,6 @@
  * 05/07/23 CB check in sendEmail that user has not opted out
  * 10/08/23 CB created from com_ramblers Walk
  * 04/03/24 CB hide phone number unless logged in
- * 15/12/25 CB Created from WalkHelper for functions other than CRUD
  */
 
 namespace Ramblers\Component\Ra_walks\Site\Helpers;
@@ -22,7 +21,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 
-class WalksHelper {
+class WalkHelper {
 
     protected $db;
     protected $item;

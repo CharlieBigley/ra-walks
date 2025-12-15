@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="Area Reports" option="View">
+		<message>
+			<![CDATA[Reports for specified Area]]>
+		</message>
+	</layout>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">  
+                            <field name="type" type="radio" default="home" label="Group type">
+                                <option value="home">Home area</option>
+                                <option value="national">National reports</option>
+                                <option value="specified">As specified below</option>
+                             </field>
+                             <field 
+                                name="area" 
+                                type="text" 
+                                label="Area code" 
+                                description="Two character Area code" />                 
+			</fieldset>
+		</fields>
+	</config>
+</metadata>
