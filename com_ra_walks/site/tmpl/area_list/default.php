@@ -26,7 +26,7 @@ $wa->registerAndUseStyle('ramblers.css', 'com_ta_tools/css/ramblers.css');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 
 // See if RA Walks has been installed
 $com_ra_walks = ComponentHelper::isEnabled('com_ra_walks', true);
@@ -88,24 +88,24 @@ if (empty($this->items)) {
     echo '</thead>' . PHP_EOL;
 
     foreach ($this->items as $i => $item) {
-        $group_count = $objHelper->getValue('SELECT COUNT(id) FROM #__ra_groups WHERE code LIKE "' . $item->code . '%"');
+        $group_count = $toolsHelper->getValue('SELECT COUNT(id) FROM #__ra_groups WHERE code LIKE "' . $item->code . '%"');
         echo "<tr>";
         echo "<td>" . $item->code . "</td>";
         echo "<td>" . $item->name;
         if ($com_ra_walks) {
-            echo $objHelper->showLocation($item->latitude, $item->longitude, 'O');
+            echo $toolsHelper->showLocation($item->latitude, $item->longitude, 'O');
         }
         echo '</td>';
 
         echo "<td>" . $item->nation . "</td>";
         echo "<td>" . $item->cluster . "</td>";
 
-//        echo '<td>' . $objHelper->showLocation($item->latitude, $item->longitude, 'O') . '</td>';
+//        echo '<td>' . $toolsHelper->showLocation($item->latitude, $item->longitude, 'O') . '</td>';
         echo '<td>';
         if ($item->website == "") {
-            echo $objHelper->buildLink($item->co_url, $item->co_url, True, "");
+            echo $toolsHelper->buildLink($item->co_url, $item->co_url, True, "");
         } else {
-            echo $objHelper->buildLink($item->website, $item->website, True, "");
+            echo $toolsHelper->buildLink($item->website, $item->website, True, "");
         }
         echo '</td>';
 
@@ -124,16 +124,16 @@ if (empty($this->items)) {
             $sql = "SELECT COUNT(id) FROM #__ra_walks  ";
             $sql .= "WHERE group_code LIKE '" . $item->code . "%'";
 //            echo $sql;
-            $count_walks = $objHelper->getValue($sql);
+            $count_walks = $toolsHelper->getValue($sql);
             if ($count_walks > 0) {
                 // If number of walk greater then 50, allow further analyses, else show them as a list
                 if ($count_walks > 50) {
-                    echo $count_walks . $objHelper->imageButton("I", $target_reports . $item->code . '&scope=A');
+                    echo $count_walks . $toolsHelper->imageButton("I", $target_reports . $item->code . '&scope=A');
                 } else {
                     $target = 'index.php?option=com_ra_walks&view=reports_matrix&report_type=L';
                     $target .= '&mode=A&scope=A&opt=' . $item->code;
                     $target .= '&row=A&row_value=' . ToolsHelper::convert_to_ASCII($item->name);
-                    echo $objHelper->buildLink($target, $count_walks, True);
+                    echo $toolsHelper->buildLink($target, $count_walks, True);
                 }
             }
             echo "</td>";
@@ -143,24 +143,24 @@ if (empty($this->items)) {
             $sql .= "WHERE walks.group_code LIKE '" . $item->code . "%'";
             $sql .= "AND (datediff(walk_date, CURRENT_DATE) >= 0) ";
             $sql .= "AND (walks.state=1) ";
-            $count_walks = $objHelper->getValue($sql);
+            $count_walks = $toolsHelper->getValue($sql);
             if ($count_walks > 0) {
                 // If number of walk greater then 50, allow further analyses, else show them as a list
                 if ($count_walks > 50) {
-                    echo $count_walks . $objHelper->imageButton("I", $target_reports . $item->code . '&scope=F');
+                    echo $count_walks . $toolsHelper->imageButton("I", $target_reports . $item->code . '&scope=F');
                 } else {
                     $target = 'index.php?option=com_ra_walks&view=reports_matrix&report_type=L';
                     $target .= '&mode=A&scope=F&opt=' . $item->code;
                     $target .= '&row=A&row_value=' . ToolsHelper::convert_to_ASCII($item->name);
-                    echo $objHelper->buildLink($target, $count_walks, True);
+                    echo $toolsHelper->buildLink($target, $count_walks, True);
                 }
             }
             echo '</td>';
             echo '<td>';
-            echo $objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showEventsArea&callback=area_list&code=" . $item->code, 'Show feed');
+            echo $toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showEventsArea&callback=area_list&code=" . $item->code, 'Show feed');
             echo '</td>';
         } else {
-            echo '<td>' . $objHelper->showLocation($item->latitude, $item->longitude, 'O') . '</td>';
+            echo '<td>' . $toolsHelper->showLocation($item->latitude, $item->longitude, 'O') . '</td>';
 //echo '<td>lat ' . $row->latitude . ', long ' . $row->latitude . '</td>';
         }
         echo "</tr>";
@@ -170,7 +170,7 @@ if (empty($this->items)) {
     echo "<tr>";
     echo "<td>";
     $target = $current_uri . '&layout=print&tmpl=component';
-    echo $objHelper->buildLink($target, 'Print');
+    echo $toolsHelper->buildLink($target, 'Print');
     echo "</td>";
     echo "<td>";
     // load the pagination.
@@ -193,12 +193,12 @@ echo '</form>';
 if ($this->nation != '') {
     $nation_id = Factory::getApplication()->input->getCmd('nation', '0');
     $sql = 'SELECT COUNT(*) FROM #__ra_areas WHERE nation_id=' . $nation_id;
-    $count = $objHelper->getValue($sql);
+    $count = $toolsHelper->getValue($sql);
     echo 'Number of Areas for ' . $this->nation . '=' . $count;
 } else {
     if ($this->cluster != '') {
         $sql = 'SELECT COUNT(*) FROM #__ra_areas WHERE cluster="' . $this->cluster . '"';
-        $count = $objHelper->getValue($sql);
+        $count = $toolsHelper->getValue($sql);
         echo 'Number of Areas for Cluster ' . $this->cluster . '=' . $count;
     }
 }

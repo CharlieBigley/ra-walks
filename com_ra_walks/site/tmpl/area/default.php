@@ -20,7 +20,7 @@ use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
 echo "<!-- Code from ' . __FILE__ . ' -->" . PHP_EOL;
 $JsonHelper = new JsonHelper;
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 $objTable = new ToolsTable();
 
 $objApp = Factory::getApplication();
@@ -31,9 +31,9 @@ $sql = "SELECT a.id, a.name AS area_name, n.name as nation_name ";
 $sql .= "FROM #__ra_areas AS a ";
 $sql .= "LEFT JOIN #__ra_nations AS n on n.id = a.nation_id ";
 $sql .= "WHERE a.code='" . $this->area . "' ";
-$item = $objHelper->getItem($sql);
+$item = $toolsHelper->getItem($sql);
 if (is_null($item)) {
-    echo $objHelper->message;
+    echo $toolsHelper->message;
     $id = 0;
     $name = "?";
     $nation = '';
@@ -65,8 +65,8 @@ $sql .= "INNER JOIN #__ra_groups AS `groups` on `groups`.area_id = a.id ";
 $sql .= "WHERE a.id=" . $id;
 $sql .= " order by `groups`.code, `groups`.name";
 //echo $sql;
-$rows = $objHelper->getRows($sql);
-$record_count = $objHelper->rows;
+$rows = $toolsHelper->getRows($sql);
+$record_count = $toolsHelper->rows;
 if ($record_count == 0) {
     echo "No data found for " . $sql . "<br>";
 } else {
@@ -104,45 +104,45 @@ if ($record_count == 0) {
     foreach ($rows as $row) {
         $objTable->add_item($row->code);
         $objTable->add_item($row->Group);
-        $objTable->add_item($objHelper->showLocation($row->latitude, $row->longitude, 'O'));
+        $objTable->add_item($toolsHelper->showLocation($row->latitude, $row->longitude, 'O'));
         if ($row->website == "") {
             $objTable->add_item("");
         } else {
-            $link = $objHelper->buildLink($row->website, $row->website, True, "");
+            $link = $toolsHelper->buildLink($row->website, $row->website, True, "");
             $objTable->add_item($link);
         }
 
         if ($com_ra_walks) {
             $sql = "SELECT COUNT(id) FROM #__ra_walks  ";
             $sql .= "WHERE group_code='" . $row->code . "'";
-            $count_walks = $objHelper->getValue($sql);
+            $count_walks = $toolsHelper->getValue($sql);
             if ($count_walks == 0) {
                 //$objTable->add_item($sql);
                 $objTable->add_item("");
             } else {
-                $link = $objHelper->imageButton("I", $target_reports . "&scope=A&group_code=" . $row->code, true);
+                $link = $toolsHelper->imageButton("I", $target_reports . "&scope=A&group_code=" . $row->code, true);
                 $objTable->add_item($count_walks . $link);
             }
             $sql = "Select count(walks.id) from #__ra_walks as walks ";
             $sql .= "Where walks.group_code='" . $row->code . "'";
             $sql .= "AND (datediff(walk_date, CURRENT_DATE) >= 0) ";
             $sql .= "AND (state=1) ";
-            $count_walks = $objHelper->getValue($sql);
+            $count_walks = $toolsHelper->getValue($sql);
             $link = '';
             if ($count_walks == 0) {
                 $objTable->add_item("");
             } else {
-                $link = $objHelper->imageButton("I", $target_reports . "&scope=F&group_code=" . $row->code, true);
+                $link = $toolsHelper->imageButton("I", $target_reports . "&scope=F&group_code=" . $row->code, true);
                 $objTable->add_item($count_walks . $link);
 //                $target = 'https://walks-manager.ramblers.org.uk/api/volunteers/walksevents?types=group-walk&api-key=742d93e8f409bf2b5aec6f64cf6f405e&groups=' . $row->code;
                 $target = $JsonHelper->groupFeed($row->code);
-                $link = $objHelper->buildLink($target, 'Show feed', True);
+                $link = $toolsHelper->buildLink($target, 'Show feed', True);
             }
-            $link .= $objHelper->buildLink("index.php?option=com_ra_walks&task=area.refreshWalks&code=" . $row->code, 'Refresh');
+            $link .= $toolsHelper->buildLink("index.php?option=com_ra_walks&task=area.refreshWalks&code=" . $row->code, 'Refresh');
             $objTable->add_item($link);
 //            $objTable->add_item($this->getCountEvents());
             if ($callback == "areas") {
-                $record_count2 = $objHelper->countGroupFollowers($row->code);
+                $record_count2 = $toolsHelper->countGroupFollowers($row->code);
                 if ($record_count2 == 0) {
                     $objTable->add_item("");
                 } else {
@@ -150,7 +150,7 @@ if ($record_count == 0) {
                 }
             }
         } else {
-            $objTable->add_item($objHelper->buildLink($target_programme . $row->code, 'Show'));
+            $objTable->add_item($toolsHelper->buildLink($target_programme . $row->code, 'Show'));
         }
         $objTable->generate_line();
     }
@@ -164,7 +164,7 @@ if ($callback == "areas") {
 } else {
     $target = "index.php?option=com_ra_walks&view=area_list";
 }
-echo $objHelper->backButton($target);
+echo $toolsHelper->backButton($target);
 
 echo "<!-- End of code from ' . __FILE__ . ' -->" . PHP_EOL;
 ?>

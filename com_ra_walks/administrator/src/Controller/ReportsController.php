@@ -32,7 +32,7 @@ class ReportsController extends FormController {
     protected $back;
     protected $db;
     protected $objApp;
-    protected $objHelper;
+    protected $toolsHelper;
     protected $prefix;
     protected $query;
     protected $scope;
@@ -40,7 +40,7 @@ class ReportsController extends FormController {
     public function __construct() {
         parent::__construct();
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
         $this->objApp = Factory::getApplication();
         $this->prefix = 'Reports: ';
         $this->back = 'administrator/index.php?option=com_ra_tools&view=reports';
@@ -60,10 +60,10 @@ class ReportsController extends FormController {
         $sql .= 'LEFT JOIN #__ra_walks AS w ON w.leader_user_id = a.id ';
         $sql .= 'GROUP BY a.ra_group_code ';
         $sql .= 'ORDER BY a.ra_group_code ';
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         //      Show link that allows page to be printed
         $target = 'index.php?option=com_ra_wf&task=reports.countUsers';
-        echo $this->objHelper->showPrint($target) . '<br>' . PHP_EOL;
+        echo $this->toolsHelper->showPrint($target) . '<br>' . PHP_EOL;
         $objTable = new ToolsTable;
         $objTable->add_header("Code,Group,Count,Earliest walk,Latest walk");
         $target = 'administrator/index.php?option=com_ra_wf&task=reports.showUsersForGroup&group=';
@@ -71,7 +71,7 @@ class ReportsController extends FormController {
             if ($row->GroupCode == '') {
                 $objTable->add_item('');
             } else {
-                $objTable->add_item($this->objHelper->buildLink($target . $row->GroupCode, $row->GroupCode));
+                $objTable->add_item($this->toolsHelper->buildLink($target . $row->GroupCode, $row->GroupCode));
             }
             $objTable->add_item($row->name);
             $objTable->add_item($row->Number);
@@ -80,7 +80,7 @@ class ReportsController extends FormController {
             $objTable->generate_line();
         }
         $objTable->generate_table();
-        echo $this->objHelper->backButton('administrator/index.php?option=com_ra_wf&view=reports');
+        echo $this->toolsHelper->backButton('administrator/index.php?option=com_ra_wf&view=reports');
 //        echo "<p>";
     }
 
@@ -116,7 +116,7 @@ class ReportsController extends FormController {
         $group_code = $this->objApp->input->getCmd('group_code', 'NS03');
         $this->scope = $this->objApp->input->getCmd('scope', '');
         $csv = substr($this->objApp->input->getCmd('csv', ''), 0, 1);
-        ToolBarHelper::title($this->prefix . 'Feed update for ' . $this->objHelper->lookupGroup($group_code));
+        ToolBarHelper::title($this->prefix . 'Feed update for ' . $this->toolsHelper->lookupGroup($group_code));
         $objTable = new ToolsTable();
 
         $objTable->add_header("Date,Message");
@@ -126,7 +126,7 @@ class ReportsController extends FormController {
         $sql .= "WHERE `groups`.code='" . $group_code . "' ";
         $sql .= 'ORDER BY date_amended DESC ';
         //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->date_amended);
             $objTable->add_item($row->field_value);
@@ -134,10 +134,10 @@ class ReportsController extends FormController {
         }
         $objTable->generate_table();
         $back = "administrator/index.php?option=com_ra_wf&view=reports_group&group_code=" . $group_code . '&scope=' . $this->scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
 //        if ($csv == '') {
 //            $target = "administrator/index.php?option=com_ra_wf&task=reports.showFeed&csv=feed&group_code=" . $group_code . '&scope=' . $this->scope;
-//            echo $this->objHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
+//            echo $this->toolsHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
 //        }
     }
 
@@ -155,7 +155,7 @@ class ReportsController extends FormController {
         $sql .= 'ORDER BY log_date DESC ';
         $sql .= "Limit 28";
         //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->log_date);
             $objTable->add_item($row->message);
@@ -163,10 +163,10 @@ class ReportsController extends FormController {
         }
         $objTable->generate_table();
         $back = "administrator/index.php?option=com_ra_tools&view=reports_area&area=NAT&scope=" . $this->scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
         if ($csv == '') {
             $target = "administrator/index.php?option=com_ra_wf&task=reports.showFeedSummary&csv=feedSummary";
-            echo $this->objHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
+            echo $this->toolsHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
         }
     }
 
@@ -177,13 +177,13 @@ class ReportsController extends FormController {
         $groups_count = 0;
         $groups_found = 0;
         $area_code = 'NS';
-        echo "<h2>Feed update for " . $this->objHelper->lookupArea($area) . "</h2>";
+        echo "<h2>Feed update for " . $this->toolsHelper->lookupArea($area) . "</h2>";
         $sql = "SELECT code from #__ra_groups where code LIKE '" . $area . "%' ORDER BY code";
         $objTable = new ToolsTable();
         $objTable->add_header("Group,Date,Message");
 
-        $groups = $this->objHelper->getRows($sql);
-        $groups_count = $this->objHelper->rows;
+        $groups = $this->toolsHelper->getRows($sql);
+        $groups_count = $this->toolsHelper->rows;
         foreach ($groups as $group) {
             $sql = "SELECT `groups`.code, date_amended, field_value ";
             $sql .= "FROM #__ra_groups_audit AS audit ";
@@ -191,7 +191,7 @@ class ReportsController extends FormController {
             $sql .= "WHERE `groups`.code='" . $group->code . "' ";
             $sql .= 'ORDER BY date_amended DESC LIMIT 7';
 //            echo $sql . '<br>';
-            $rows = $this->objHelper->getRows($sql);
+            $rows = $this->toolsHelper->getRows($sql);
             foreach ($rows as $row) {
                 if ($current_group == $row->code) {
 
@@ -209,7 +209,7 @@ class ReportsController extends FormController {
         $objTable->generate_table();
         echo $groups_found . " groups out of " . $groups_count;
         $back = "administrator/index.php?option=com_ra_tools&view=reports_area&area=" . $area . '&scope=' . $this->scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     function showFollowers() {
@@ -223,7 +223,7 @@ class ReportsController extends FormController {
         $sql .= "INNER JOIN #__ra_walks as w on w.id = f.walk_id ";
         $sql .= "GROUP BY p.id, ra_display_name, ra_group_code ";
         $sql .= "ORDER BY COUNT(w.id) DESC ";
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
 //        $target = 'index.php?option=com_ra_wf&task=reports.showFollowings&user=';
         $objTable = new ToolsTable();
 //        $objTable->set_csv(True);
@@ -232,7 +232,7 @@ class ReportsController extends FormController {
             $objTable->add_item($row->ra_display_name);
             $objTable->add_item($row->ra_group_code);
             $objTable->add_item($row->Num);
-//            $link = $this->objHelper->buildLink($target . $row->id), $row->Num);
+//            $link = $this->toolsHelper->buildLink($target . $row->id), $row->Num);
 //            $objTable->add_item($link);
             $objTable->add_item($row->Earliest);
             $objTable->add_item($row->Latest);
@@ -242,7 +242,7 @@ class ReportsController extends FormController {
         $objTable->generate_table();
 
         $back = "administrator/index.php?option=com_ra_wf&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showFollowersByDate() {
@@ -256,9 +256,9 @@ class ReportsController extends FormController {
 //        echo $sql . '<br>';
         echo "<h2>Reporting</h2>";
         echo "<h4>Followers by date</h4>";
-        $this->objHelper->showSql($sql);
+        $this->toolsHelper->showSql($sql);
         $back = "administrator/index.php?option=com_ra_wf&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showLeaders() {
@@ -274,7 +274,7 @@ class ReportsController extends FormController {
         </script>
         <?php
 
-        $this->objHelper->showMenu("WalksFollowers");
+        $this->toolsHelper->showMenu("WalksFollowers");
 
         $sql = "SELECT  date_format(walk_date,'%a %e-%m-%y') AS Date,";
         $sql .= "walks.title as 'Title', ";
@@ -307,9 +307,9 @@ class ReportsController extends FormController {
         Helper::selectScope($this->scope, $target);
         echo '<br>';
 
-        $this->objHelper->showSql($sql);
+        $this->toolsHelper->showSql($sql);
         $back = "administrator/index.php?option=com_ra_wf&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showLogfile() {
@@ -340,18 +340,18 @@ class ReportsController extends FormController {
         $sql .= "WHERE log_date >='" . date_format($target, "Y/m/d H:i:s") . "' ";
         $sql .= "AND log_date <'" . date_format($target, "Y/m/d 23:59:59") . "' ";
         $sql .= "ORDER BY log_date DESC, record_type ";
-        if ($this->objHelper->showSql($sql)) {
+        if ($this->toolsHelper->showSql($sql)) {
             echo "<h5>End of logfile records for " . date_format($target, "D d M") . "</h5>";
         } else {
-            echo 'Error: ' . $this->objHelper->error . '<br>';
+            echo 'Error: ' . $this->toolsHelper->error . '<br>';
         }
 
-        echo $this->objHelper->buildButton("administrator/index.php?option=com_ra_tools&task=reports.showLogfile&offset=" . $previous_offset, "Previous day", False, 'grey');
+        echo $this->toolsHelper->buildButton("administrator/index.php?option=com_ra_tools&task=reports.showLogfile&offset=" . $previous_offset, "Previous day", False, 'grey');
         if ($next_offset >= 0) {
-            echo $this->objHelper->buildButton("administrator/index.php?option=com_ra_tools&task=reports.showLogfile&offset=" . $next_offset, "Next day", False, 'teal');
+            echo $this->toolsHelper->buildButton("administrator/index.php?option=com_ra_tools&task=reports.showLogfile&offset=" . $next_offset, "Next day", False, 'teal');
         }
         $target = "administrator/index.php?option=com_ra_tools&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     function showUsers() {
@@ -368,9 +368,9 @@ class ReportsController extends FormController {
         $sql .= "LEFT JOIN #__users as users on profile.id = users.id ";
         $sql .= "WHERE group_code>''";
         $sql .= "order by profile.id";
-        $this->objHelper->showSql($sql);
+        $this->toolsHelper->showSql($sql);
         $back = "administrator/index.php?option=com_ra_wf&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     function showUsersByRange() {
@@ -386,9 +386,9 @@ class ReportsController extends FormController {
         $sql .= "WHERE ra_group_code>''";
         $sql .= "AND (min_miles >0 OR max_miles >0)";
         $sql .= "ORDER BY min_miles, max_miles";
-        $this->objHelper->showSql($sql);
+        $this->toolsHelper->showSql($sql);
         $back = "administrator/index.php?option=com_ra_wf&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showUsersForGroup() {
@@ -399,11 +399,11 @@ class ReportsController extends FormController {
         $sql .= 'INNER JOIN #__users AS u ON u.id = a.id ';
         $sql .= 'WHERE a.ra_group_code=' . $this->db->quote($group);
 //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         //      Show link that allows page to be printed
         $target = 'index.php?option=com_ra_wf&task=reports.showUsersForGroup&group=' . $group;
         echo '<h4>Users for Group ' . $group . '</h4>';
-        echo $this->objHelper->showPrint($target) . '<br>' . PHP_EOL;
+        echo $this->toolsHelper->showPrint($target) . '<br>' . PHP_EOL;
         $objTable = new ToolsTable;
         $objTable->add_header("Name,Email");
         foreach ($rows as $row) {
@@ -412,7 +412,7 @@ class ReportsController extends FormController {
             $objTable->generate_line();
         }
         $objTable->generate_table();
-        echo $this->objHelper->backButton('administrator/index.php?option=com_ra_wf&task=reports.countUsers');
+        echo $this->toolsHelper->backButton('administrator/index.php?option=com_ra_wf&task=reports.countUsers');
 //        echo "<p>";
     }
 
@@ -449,18 +449,18 @@ class ReportsController extends FormController {
         $sql .= "AND date_amended <'" . date_format($target, "Y/m/d 23:59:59") . "' ";
         $sql .= "ORDER BY date_amended DESC, record_type ";
 //        $sql .= "LIMIT 10";
-        if ($this->objHelper->showSql($sql)) {
+        if ($this->toolsHelper->showSql($sql)) {
 
         } else {
-            echo "Error: " . $this->objHelper->error;
+            echo "Error: " . $this->toolsHelper->error;
         }
 //echo "<h5>End of audit records for " . date_format($target, "D d M") . "</h5>";
-        echo $this->objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.walksAudit&offset=$previous_offset", "Previous day", False, 'grey') . " ";
+        echo $this->toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.walksAudit&offset=$previous_offset", "Previous day", False, 'grey') . " ";
         if ($next_offset >= 0) {
-            echo $this->objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.walksAudit&offset=$next_offset", "Next day", False, 'teal');
+            echo $this->toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.walksAudit&offset=$next_offset", "Next day", False, 'teal');
         }
         $back = "administrator/index.php?option=com_ra_wf&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
 }

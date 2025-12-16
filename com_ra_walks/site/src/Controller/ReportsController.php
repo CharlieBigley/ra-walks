@@ -39,14 +39,14 @@ class ReportsController extends FormController {
     protected $criteria_sql;
     protected $db;
     protected $objApp;
-    protected $objHelper;
+    protected $toolsHelper;
     protected $query;
     protected $scope;
 
     public function __construct(array $config = array(), \Joomla\CMS\MVC\Factory\MVCFactoryInterface $factory = null) {
         parent::__construct($config, $factory);
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
         $this->objApp = Factory::getApplication();
         // Import CSS
         $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
@@ -74,21 +74,21 @@ class ReportsController extends FormController {
         $sql .= 'LIMIT 20';
 //        echo "$sql<br>";
         $target = "index.php?option=com_ra_walks&task=reports.showFeedback&walk_date=";
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $date_parameter = $row->Year . '-' . $this->prependZero($row->Month) . '-' . $this->prependZero($row->Day);
             $date_display = $row->Day . '/' . $row->Month . '/' . $row->Year;
             $objTable->add_item($row->weekday . ' ' . $date_display);
             $objTable->add_item($row->title);
             $objTable->add_item($row->contact_display_name);
-            $objTable->add_item($this->objHelper->buildLink($target . $date_parameter, $row->Num));
+            $objTable->add_item($this->toolsHelper->buildLink($target . $date_parameter, $row->Num));
 //            $objTable->add_item($target);
             $objTable->generate_line();
         }
         $objTable->generate_table();
 //        echo $objTable->num_rows . ' Walks<br>';
         $back = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     function countWalks() {
@@ -96,7 +96,7 @@ class ReportsController extends FormController {
         $callback = $this->objApp->input->getCmd('callback', 'view=walks');
         echo "<h2>Total walks by Group";
         if (strlen($code) == 2) {
-            echo ' for ' . $this->objHelper->lookupArea($code);
+            echo ' for ' . $this->toolsHelper->lookupArea($code);
         }
         echo "</h2>";
         $objTable = new ToolsTable();
@@ -110,7 +110,7 @@ class ReportsController extends FormController {
         $sql .= 'GROUP BY group_code ';
         $sql .= 'ORDER BY group_code ';
 //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         $total_walks = 0;
         foreach ($rows as $row) {
             $objTable->add_item($row->group_code);
@@ -128,7 +128,7 @@ class ReportsController extends FormController {
         } else {
             $back .= $callback . '&area=' . $code;
         }
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function countWalksByDate() {
@@ -140,7 +140,7 @@ class ReportsController extends FormController {
         $sql .= 'FROM #__ra_walks ';
         $sql .= 'GROUP BY YEAR(walk_date), MONTH(walk_date) ';
         $sql .= 'ORDER BY YEAR(walk_date), MONTH(walk_date) ';
-        $months = $this->objHelper->getRows($sql);
+        $months = $this->toolsHelper->getRows($sql);
         foreach ($months as $month) {
             $objTable->add_item($month->yy);
             $objTable->add_item($month->mm);
@@ -155,7 +155,7 @@ class ReportsController extends FormController {
             $objTable->generate_line();
         }
         $objTable->generate_table();
-        echo $this->objHelper->backButton('index.php?option=com_ra_walks&view=reports');
+        echo $this->toolsHelper->backButton('index.php?option=com_ra_walks&view=reports');
     }
 
     public function debug() { // http://localhost/index.php?option=com_ra_walks&task=reports.debug
@@ -317,19 +317,19 @@ class ReportsController extends FormController {
             $objShow->set_mode($date_mode);
             $objShow->set_state("P");
             $objShow->set_criteria($where);
-            if ($this->objHelper->showQuery($sql)) {
-                echo "Error: " . $this->objHelper->message;
+            if ($this->toolsHelper->showQuery($sql)) {
+                echo "Error: " . $this->toolsHelper->message;
             }
-            echo $this->objHelper->backButton($back);
+            echo $this->toolsHelper->backButton($back);
         } else {
 // $group == 1, Aggregating by chosen database field
-            $num_records = $this->objHelper->openRs($rs, $sql, $message);
+            $num_records = $this->toolsHelper->openRs($rs, $sql, $message);
             if ($num_records == 0) {
-//            $rows = $this->objHelper->getRows($sql);
-//            if ($this->objHelper->rows == 0) {
+//            $rows = $this->toolsHelper->getRows($sql);
+//            if ($this->toolsHelper->rows == 0) {
                 echo "Program: message returned = $message";
             } else {
-                $num_records = $this->objHelper->openRs($rs, $sql, $message);
+                $num_records = $this->toolsHelper->openRs($rs, $sql, $message);
                 $total = 0;
                 $objTable = new ToolsTable;
                 $objTable->width = 40;
@@ -346,11 +346,11 @@ class ReportsController extends FormController {
                         $objTable->add_item("");
                     } else {
                         if ($row[1] > 10) {
-                            $link = $this->objHelper->buildLink($target_drilldown . $row[0], "Drilldown", False, "link-button button-p0159");
+                            $link = $this->toolsHelper->buildLink($target_drilldown . $row[0], "Drilldown", False, "link-button button-p0159");
                         } else {
-                            $link = $this->objHelper->buildLink($target_display . $row[0], "Display", False, "link-button button-p0159");
+                            $link = $this->toolsHelper->buildLink($target_display . $row[0], "Display", False, "link-button button-p0159");
                         }
-//$link = $this->objHelper->imageButton("I", $target . $row[0]);
+//$link = $this->toolsHelper->imageButton("I", $target . $row[0]);
                         $objTable->add_item($link);
                     }
                     $objTable->generate_line();
@@ -361,7 +361,7 @@ class ReportsController extends FormController {
             if (isset($total)) {
                 echo "Total " . $total;
             }
-            echo $this->objHelper->backButton($back);
+            echo $this->toolsHelper->backButton($back);
         }
     }
 
@@ -369,9 +369,9 @@ class ReportsController extends FormController {
         if ($callback == '') {
             $target = "index.php?option=com_ra_walks&view=reports_area&area=NAT";
         } else {
-            $target = $this->objHelper::convert_from_ASCII($callback);
+            $target = $this->toolsHelper::convert_from_ASCII($callback);
         }
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     public function extractAreas() {
@@ -384,7 +384,7 @@ ORDER BY nations.name, areas.name";
         $objTable = new ToolsTable();
         $objTable->set_csv('areas');
         $objTable->add_header("Nation,Area,Code,Website");
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->nation);
             $objTable->add_item($row->Area);
@@ -394,7 +394,7 @@ ORDER BY nations.name, areas.name";
         }
         $objTable->generate_table();
         $back = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function groupsNoWalks() {
@@ -419,7 +419,7 @@ ORDER BY nations.name, areas.name";
         } else {
             if (!$area == '') {
                 $this->query->WHERE("SUBSTRING(g.code,1,2)='" . substr($area, 0, 2) . "'");
-                $area_name = $this->objHelper->getValue("SELECT name FROM #__ra_areas WHERE code='" . substr($area, 0, 2) . "' ");
+                $area_name = $this->toolsHelper->getValue("SELECT name FROM #__ra_areas WHERE code='" . substr($area, 0, 2) . "' ");
                 echo ", Area=" . $area_name;
             }
         }
@@ -452,9 +452,9 @@ ORDER BY nations.name, areas.name";
         if ($callback == '') {
             $target = "index.php?option=com_ra_walks&view=reports";
         } else {
-            $target = $this->objHelper::convert_from_ASCII($callback);
+            $target = $this->toolsHelper::convert_from_ASCII($callback);
         }
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     private function prependZero($value) {
@@ -468,7 +468,7 @@ ORDER BY nations.name, areas.name";
 
     function recentEmails() {
         // Overall index of emails, most recent first
-        $objHelper = new ToolsHelper;
+        $toolsHelper = new ToolsHelper;
         if (Factory::getUser()->id == 0) {
             echo 'Insufficient access';
             return;
@@ -484,15 +484,15 @@ ORDER BY nations.name, areas.name";
         $sql .= 'ORDER BY e.date_sent DESC, w.id DESC ';
         $sql .= 'LIMIT 50';
 
-        $objHelper->showQuery($sql);
-        echo $objHelper->generateButton("index.php?option=com_ra_walks&view=reports", "Back");
+        $toolsHelper->showQuery($sql);
+        echo $toolsHelper->generateButton("index.php?option=com_ra_walks&view=reports", "Back");
         return;
     }
 
     function recentFeedback() {
 // Overall index of blogs, most recent first
-        $objHelper = new ToolsHelper;
-        if (!$objHelper->isSuperuser()) {
+        $toolsHelper = new ToolsHelper;
+        if (!$toolsHelper->isSuperuser()) {
             echo 'Insufficient access';
             return;
         }
@@ -504,8 +504,8 @@ ORDER BY nations.name, areas.name";
         $sql .= 'ORDER BY DATE(wf.date_created) DESC, w.id DESC ';
         $sql .= 'LIMIT 50';
 
-        $objHelper->showQuery($sql);
-        echo $objHelper->generateButton("index.php?option=com_ra_walks&view=reports", "Back");
+        $toolsHelper->showQuery($sql);
+        echo $toolsHelper->generateButton("index.php?option=com_ra_walks&view=reports", "Back");
         return;
     }
 
@@ -538,7 +538,7 @@ ORDER BY nations.name, areas.name";
 
     public function sharedWalks() {
         $back = "index.php?option=com_ra_walks&task=reports.showUserGroups";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showAreaWalks() {
@@ -555,7 +555,7 @@ ORDER BY nations.name, areas.name";
         echo "<h2>Future walks for Area $code</h2>";
         $objShow->showTable();
         $back = "index.php?option=com_ra_walks&view=areas";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     function showAudit() {
@@ -588,17 +588,17 @@ ORDER BY nations.name, areas.name";
             $SQL .= 'from ' . $dbTable . ' ';
             $SQL .= 'WHERE object_id=' . $object_id . ' ORDER BY date_amended DESC';
 //            echo "<br>ShowAudit: $SQL";
-            $this->objHelper->showQuery($SQL);
+            $this->toolsHelper->showQuery($SQL);
         }
         $back = "index.php?option=com_ra_walks&" . $target;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showFeed() {
         $group_code = $this->objApp->input->getCmd('group_code', 'NS03');
         $this->scope = $this->objApp->input->getCmd('scope', 'F');
         $csv = substr($this->objApp->input->getCmd('csv', ''), 0, 1);
-        echo "<h2>Feed update for " . $this->objHelper->lookupGroup($group_code) . "</h2>";
+        echo "<h2>Feed update for " . $this->toolsHelper->lookupGroup($group_code) . "</h2>";
 
         $objTable = new ToolsTable();
         $objTable->set_csv($csv);
@@ -610,7 +610,7 @@ ORDER BY nations.name, areas.name";
         $sql .= "WHERE `groups`.code='" . $group_code . "' ";
         $sql .= 'ORDER BY date_amended DESC ';
 //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->date_amended);
             $objTable->add_item($row->field_value);
@@ -618,10 +618,10 @@ ORDER BY nations.name, areas.name";
         }
         $objTable->generate_table();
         $back = "index.php?option=com_ra_walks&view=reports_group&group_code=" . $group_code . '&scope=' . $this->scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
         if ($csv == '') {
             $target = "index.php?option=com_ra_walks&task=reports.showFeed&csv=feed&group_code=" . $group_code . '&scope=' . $this->scope;
-            echo $this->objHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
+            echo $this->toolsHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
         }
     }
 
@@ -641,7 +641,7 @@ ORDER BY nations.name, areas.name";
         $sql .= 'ORDER BY w.walk_date DESC, f.date_created DESC ';
         $sql .= 'LIMIT 20';
 //        echo "$sql<br>";
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->WalkDate);
             $objTable->add_item($row->contact_display_name);
@@ -653,7 +653,7 @@ ORDER BY nations.name, areas.name";
         $objTable->generate_table();
 //        echo $objTable->num_rows . ' Walks<br>';
         $back = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showFeedSummary() {
@@ -670,7 +670,7 @@ ORDER BY nations.name, areas.name";
         $sql .= 'ORDER BY log_date DESC ';
         $sql .= "Limit 28";
 //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->log_date);
             $objTable->add_item($row->message);
@@ -678,10 +678,10 @@ ORDER BY nations.name, areas.name";
         }
         $objTable->generate_table();
         $back = "index.php?option=com_ra_walks&view=reports_area&area=NAT&scope=" . $this->scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
         if ($csv == '') {
             $target = "index.php?option=com_ra_walks&task=reports.showFeedSummary&csv=feedSummary";
-            echo $this->objHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
+            echo $this->toolsHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
         }
     }
 
@@ -692,13 +692,13 @@ ORDER BY nations.name, areas.name";
         $groups_count = 0;
         $groups_found = 0;
         $area_code = 'NS';
-        echo "<h2>Feed update for " . $this->objHelper->lookupArea($area) . "</h2>";
+        echo "<h2>Feed update for " . $this->toolsHelper->lookupArea($area) . "</h2>";
         $sql = "SELECT code from #__ra_groups WHERE code LIKE '" . $area . "%' ORDER BY code";
         $objTable = new ToolsTable();
         $objTable->add_header("Group,Date,Message");
 
-        $groups = $this->objHelper->getRows($sql);
-        $groups_count = $this->objHelper->rows;
+        $groups = $this->toolsHelper->getRows($sql);
+        $groups_count = $this->toolsHelper->rows;
         foreach ($groups as $group) {
             $sql = "SELECT `groups`.code, date_amended, field_value ";
             $sql .= "FROM #__ra_groups_audit AS audit ";
@@ -706,7 +706,7 @@ ORDER BY nations.name, areas.name";
             $sql .= "WHERE `groups`.code='" . $group->code . "' ";
             $sql .= 'ORDER BY date_amended DESC LIMIT 7';
 //            echo $sql . '<br>';
-            $rows = $this->objHelper->getRows($sql);
+            $rows = $this->toolsHelper->getRows($sql);
             foreach ($rows as $row) {
                 if ($current_group == $row->code) {
 
@@ -724,7 +724,7 @@ ORDER BY nations.name, areas.name";
         $objTable->generate_table();
         echo $groups_found . " groups out of " . $groups_count;
         $back = "index.php?option=com_ra_walks&view=reports_area&area=" . $area . '&scope=' . $this->scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showFollowersByDate() {
@@ -738,16 +738,16 @@ ORDER BY nations.name, areas.name";
 //        echo $sql . '<br>';
         echo "<h2>Reporting</h2>";
         echo "<h4>Future Followers by date</h4>";
-        $this->objHelper->showQuery($sql);
+        $this->toolsHelper->showQuery($sql);
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     public function showGroupFollowers() {
         $group_token = $this->objApp->input->getCmd('group');
-        $group_code = $this->objHelper::convert_from_ASCII($group_token);
+        $group_code = $this->toolsHelper::convert_from_ASCII($group_token);
         if (strlen($group_code) == 4) {
-            $group_name = $this->objHelper->lookupGroup($group_code);
+            $group_name = $this->toolsHelper->lookupGroup($group_code);
         } else {
             $group_name = $group_code;
         }
@@ -755,15 +755,15 @@ ORDER BY nations.name, areas.name";
         $sql = "SELECT profile.preferred_name as 'member', ";
         $sql .= "profile.privacy_level ";
         $sql .= "FROM #__ra_profiles as profile ";
-        $sql .= "WHERE group_code='" . $this->objHelper::convert_from_ASCII($group_token) . "' ";
+        $sql .= "WHERE group_code='" . $this->toolsHelper::convert_from_ASCII($group_token) . "' ";
         $sql .= "ORDER BY profile.preferred_name";
 //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         $objTable = new ToolsTable();
         $objTable->add_header('Member');
         foreach ($rows as $row) {
             if ($row->privacy_level == 3) {
-//                if ($this->objHelper->isSuperuser()) {
+//                if ($this->toolsHelper->isSuperuser()) {
 //                    $objTable->add_item($row->member . ' ' . $row->privacy_level);
 //                } else {
                 $objTable->add_item("anonymous");
@@ -775,7 +775,7 @@ ORDER BY nations.name, areas.name";
         }
         $objTable->generate_table();
         $back = "index.php?option=com_ra_walks&task=reports.showUserGroups";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showGroupWalks() {
@@ -796,7 +796,7 @@ ORDER BY nations.name, areas.name";
             Factory::getApplication()->enqueueMessage('sql = ' . (string) $this->query, 'message');
         }
         $back = "index.php?option=com_ra_walks&view=area&area=" . $code;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showJointLeaders() {
@@ -831,7 +831,7 @@ ORDER BY nations.name, areas.name";
         }
         $objTable->generate_table();
         $target = "index.php?option=com_ra_walks&task=reports.showTopLeaders&opt=" . $opt . '&mode=' . $mode . '&scope=' . $this->scope;
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     public function showLeaders() {
@@ -865,7 +865,7 @@ ORDER BY nations.name, areas.name";
         }
         $objTable->generate_table();
         $target = "index.php?option=com_ra_walks&task=reports.showTopLeaders&opt=" . $opt . '&mode=' . $mode . '&scope=' . $this->scope;
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     function showLeaderFeedback() {
@@ -885,7 +885,7 @@ ORDER BY nations.name, areas.name";
         $sql .= 'ORDER BY w.walk_date DESC, f.date_created DESC ';
         $sql .= 'LIMIT 20';
 //        echo "$sql<br>";
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $objTable->add_item($row->WalkDate);
             $objTable->add_item($row->title);
@@ -896,7 +896,7 @@ ORDER BY nations.name, areas.name";
         $objTable->generate_table();
 //        echo $objTable->num_rows . ' Walks<br>';
         $back = "index.php?option=com_ra_walks&view=walk_list";
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     public function showLogfile() {
@@ -926,18 +926,18 @@ ORDER BY nations.name, areas.name";
         $sql .= "WHERE log_date >='" . date_format($target, "Y/m/d H:i:s") . "' ";
         $sql .= "AND log_date <'" . date_format($target, "Y/m/d 23:59:59") . "' ";
         $sql .= "ORDER BY log_date DESC, record_type DESC";
-        if ($this->objHelper->showQuery($sql)) {
+        if ($this->toolsHelper->showQuery($sql)) {
             echo "<h5>End of logfile records for " . date_format($target, "D d M") . "</h5>";
         } else {
-            echo 'Error: ' . $this->objHelper->error . '<br>';
+            echo 'Error: ' . $this->toolsHelper->error . '<br>';
         }
 
-        echo $this->objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showLogfile&offset=" . $previous_offset, "Previous day", False, "link-button button-p5565");
+        echo $this->toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showLogfile&offset=" . $previous_offset, "Previous day", False, "link-button button-p5565");
         if ($next_offset >= 0) {
-            echo $this->objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showLogfile&offset=" . $next_offset, "Next day", False, "link-button button-p7474");
+            echo $this->toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showLogfile&offset=" . $next_offset, "Next day", False, "link-button button-p7474");
         }
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     public function showRegisteredLeaders() {
@@ -984,16 +984,16 @@ ORDER BY nations.name, areas.name";
         ToolsHelper::selectScope($this->scope, $target);
         echo '<br>';
 
-        $this->objHelper->showQuery($sql);
+        $this->toolsHelper->showQuery($sql);
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     public function showSummary() {
         $csv = substr($this->objApp->input->getCmd('csv', ''), 0, 1);
         $group_code = $this->objApp->input->getCmd('group_code', 'NS03');
         $scope = $this->objApp->input->getCmd('scope', 'F');
-        echo "<h2>Walks history for " . $this->objHelper->lookupGroup($group_code) . "</h2>";
+        echo "<h2>Walks history for " . $this->toolsHelper->lookupGroup($group_code) . "</h2>";
         $objTable = new ToolsTable();
         if ($csv === 'Y') {
             $objTable->set_csv('Summary');
@@ -1005,7 +1005,7 @@ ORDER BY nations.name, areas.name";
         $sql .= "WHERE group_code='" . $group_code . "' ";
         $sql .= 'ORDER BY ym ';
 //        echo $sql;
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         $total_miles = 0;
         $total_walks = 0;
         foreach ($rows as $row) {
@@ -1017,7 +1017,7 @@ ORDER BY nations.name, areas.name";
                 $objTable->add_item('');
             } else {
 //                $target = 'index.php?option=com_ra_walks&view=reports_matrix&mode=G&row=M&col=W&opt=' . $group_code;
-//                $objTable->add_item($this->objHelper->buildLink($target, $row->num_walks));
+//                $objTable->add_item($this->toolsHelper->buildLink($target, $row->num_walks));
                 $objTable->add_item($row->num_walks);
             }
             $objTable->add_item(number_format($row->joint_walks));
@@ -1033,10 +1033,10 @@ ORDER BY nations.name, areas.name";
         echo 'Total walks: ' . $total_walks . ', Total miles: ' . $total_miles . '<br>';
 
         $back = "index.php?option=com_ra_walks&view=reports_group&group_code=" . $group_code . '&scope=' . $scope;
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
         if (!$csv == 'Y') {
             $target = "index.php?option=com_ra_walks&task=reports.showSummary&csv=Y&group_code=" . $group_code;
-            echo $this->objHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
+            echo $this->toolsHelper->buildLink($target, "Extract as CSV", False, "link-button button-p0159");
         }
     }
 
@@ -1137,18 +1137,18 @@ ORDER BY nations.name, areas.name";
 //                $target = $drilldown_walks . $row->code;
                 $target = $drilldown_walks . $row->code . '&row=M&row_value=' . ToolsHelper::convert_to_ASCII($row->Min);
                 $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->Min));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->Min));
 
                 $target = $drilldown_walks . $row->code . '&row=M&row_value=' . ToolsHelper::convert_to_ASCII($row->Max);
                 $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->Max));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->Max));
 
                 $average = (round($row->Avg * 10)) / 10;
                 $objTable->add_item($average);
 
                 $target = $drilldown_walks . $row->code;
                 $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->NumWalks));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->NumWalks));
 
                 $objTable->add_item($row->NumLeaders);
                 $objTable->add_item((round(($row->NumWalks * 10) / $row->NumLeaders)) / 10);
@@ -1163,12 +1163,12 @@ ORDER BY nations.name, areas.name";
         $self .= '&scope=' . $this->scope . '&sort=' . $sort . '&limit=' . $limit;
         if ($csv == '') {
             $target = $self . "&csv=TopAreas";
-            echo $this->objHelper->buildLink($target, "Extract as CSV", false, "link-button button-p0159");
+            echo $this->toolsHelper->buildLink($target, "Extract as CSV", false, "link-button button-p0159");
         }
         $target = 'index.php?option=com_ra_walks&view=reports_area&area=NAT&scope=' . $this->scope;
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
         //echo '<a href="#top">Top</a>';
-        echo $this->objHelper->anchor();
+        echo $this->toolsHelper->anchor();
     }
 
     function showTopGroups() {
@@ -1259,13 +1259,13 @@ ORDER BY nations.name, areas.name";
                 $objTable->add_item($row->group_name);
                 $target = $drilldown_walks . $row->code;
                 $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->NumWalks));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->NumWalks));
                 $target = $drilldown_walks . $row->code . '&row=M&row_value=' . ToolsHelper::convert_to_ASCII(round($row->Min));
                 $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->Min));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->Min));
                 $target = $drilldown_walks . $row->code . '&row=M&row_value=' . ToolsHelper::convert_to_ASCII(round($row->Max));
                 $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->Max));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->Max));
                 $average = (round($row->Avg * 10)) / 10;
                 $objTable->add_item($average);
                 $objTable->add_item(number_format($row->Sum)); //
@@ -1279,7 +1279,7 @@ ORDER BY nations.name, areas.name";
         }
 //$target = "index.php?option=com_ra_walks&view=reports";
         $target = "index.php?option=com_ra_walks&view=reports_area&area=NAT&scope=" . $this->scope;
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     function showTopLeaders() {
@@ -1342,9 +1342,9 @@ ORDER BY nations.name, areas.name";
         $this->db->setQuery($this->query);
         $count = $this->db->loadResult();
         echo 'Total number of Leaders: ';
-        if ($this->objHelper->isSuperuser()) {
+        if ($this->toolsHelper->isSuperuser()) {
             $target = 'index.php?option=com_ra_walks&task=reports.showLeaders&mode=' . $mode . '&opt=' . $opt . '&scope=' . $this->scope;
-            echo $this->objHelper->buildLink($target, number_format($count));
+            echo $this->toolsHelper->buildLink($target, number_format($count));
         } else {
             echo number_format($count);
         }
@@ -1363,9 +1363,9 @@ ORDER BY nations.name, areas.name";
         $this->db->setQuery($this->query);
         $count = $this->db->loadResult();
         echo 'Two Leaders: ';
-        if ($this->objHelper->isSuperuser()) {
+        if ($this->toolsHelper->isSuperuser()) {
             $target = 'index.php?option=com_ra_walks&task=reports.showJointLeaders&mode=' . $mode . '&opt=' . $opt . '&scope=' . $this->scope;
-            echo $this->objHelper->buildLink($target, number_format($count));
+            echo $this->toolsHelper->buildLink($target, number_format($count));
         } else {
             echo number_format($count);
         }
@@ -1386,14 +1386,14 @@ ORDER BY nations.name, areas.name";
         echo "<h2>Top $limit Walk leaders, ";
         $back = "index.php?option=com_ra_walks&view=";
         if ($mode == 'G') {
-            echo 'Group=' . $opt . ' ' . $this->objHelper->lookupGroup($opt);
+            echo 'Group=' . $opt . ' ' . $this->toolsHelper->lookupGroup($opt);
             $back .= "reports_group&group_code=$opt";
         } else {
             if ($opt == 'NAT') {
                 echo 'National';
                 $back .= "reports_area&area=NAT";
             } else {
-                echo 'Area=' . $opt . ' ' . $this->objHelper->lookupArea($opt);
+                echo 'Area=' . $opt . ' ' . $this->toolsHelper->lookupArea($opt);
                 $back .= "reports_area&area=$opt";
             }
         }
@@ -1474,7 +1474,7 @@ ORDER BY nations.name, areas.name";
                 $target = $drilldown_walks . ToolsHelper::convert_to_ASCII($row->leader);
                 $target .= '&col=C&col_value=' . ToolsHelper::convert_to_ASCII($row->groups_code);
 //                $target .= '&callback=' . ToolsHelper::convert_to_ASCII($callback);
-                $objTable->add_item($this->objHelper->buildLink($target, $row->NumWalks));
+                $objTable->add_item($this->toolsHelper->buildLink($target, $row->NumWalks));
                 // http://localhost/index.php?option=com_ra_walks&view=reports_matrix&report_type=L&scope=A&mode=WL&opt=076105122032068046&col=C&
                 // col_value=078083048054&callback=105110100101120046112104112063111112116105111110061099111109095114097095119097108107115038116097115107061114101112111114116115046115104111119084111112076101097100101114115038108105109105116061050048038115111114116061077038115099111112101061065038109111100101061065038111112116061078083
 
@@ -1492,7 +1492,7 @@ ORDER BY nations.name, areas.name";
         } else {
             $back = 'index.php?option=com_ra_walks&view=' . $callback . '&area=' . $opt;
         }
-        echo $this->objHelper->backButton($back);
+        echo $this->toolsHelper->backButton($back);
     }
 
     function showUserGroups() {
@@ -1502,20 +1502,20 @@ ORDER BY nations.name, areas.name";
         $sql .= "Group by home_group ";
         $sql .= "Order by home_group ";
         echo "<h2>Groups and Users</h2>";
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         $target = 'index.php?option=com_ra_walks&task=reports.showGroupFollowers&group=';
         $objTable = new ToolsTable();
 
         echo "<table class='$this->tableClass'>";
         echo RHtml::addTableHeader(array("Group", "Count members"));
         foreach ($rows as $row) {
-            $link = $this->objHelper->buildLink($target . $this->objHelper::convert_to_ASCII($row->Group), $row->Number);
+            $link = $this->toolsHelper->buildLink($target . $this->toolsHelper::convert_to_ASCII($row->Group), $row->Number);
             echo RHtml::addTableRow(array($row->Group, $link));
         }
         echo "</table>" . PHP_EOL;
 // showGroupFollowers
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     function showUsers() {
@@ -1534,9 +1534,9 @@ ORDER BY nations.name, areas.name";
         $sql .= "order by profile.id";
         echo "<h2>Reporting</h2>";
         echo "<h4>Users</h4>";
-        $this->objHelper->showQuery($sql);
+        $this->toolsHelper->showQuery($sql);
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     function walksAudit() {
@@ -1572,18 +1572,18 @@ ORDER BY nations.name, areas.name";
         $sql .= "AND date_amended <'" . date_format($target, "Y/m/d 23:59:59") . "' ";
         $sql .= "ORDER BY date_amended DESC, record_type ";
 //        $sql .= "LIMIT 10";
-        if ($this->objHelper->showQuery($sql)) {
+        if ($this->toolsHelper->showQuery($sql)) {
 
         } else {
-            echo "Error: " . $this->objHelper->error;
+            echo "Error: " . $this->toolsHelper->error;
         }
 //echo "<h5>End of audit records for " . date_format($target, "D d M") . "</h5>";
-        echo $this->objHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksAudit&offset=$previous_offset", "Previous day", False, "link-button button-p5565") . " ";
+        echo $this->toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksAudit&offset=$previous_offset", "Previous day", False, "link-button button-p5565") . " ";
         if ($next_offset >= 0) {
-            echo $this->objHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksAudit&offset=$next_offset", "Next day", False, "link-button button-p7474");
+            echo $this->toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksAudit&offset=$next_offset", "Next day", False, "link-button button-p7474");
         }
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     public function walksByDate() {
@@ -1599,7 +1599,7 @@ ORDER BY nations.name, areas.name";
     }
 
     function walkLeaders() {
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
 
         $sql = "Select group_code, contact_display_name, contact_tel1, ";
         $sql .= "contact_tel2, contact_email ";
@@ -1609,7 +1609,7 @@ ORDER BY nations.name, areas.name";
         $sql .= "ORDER BY group_code, contact_display_name ";
 //        $sql .= "LIMIT 100";
         echo "<h4>Walk Leaders</h4>";
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
 //        $target = 'index.php?option=com_ra_walks&task=reports.showGroupFollowers&group=';
         $objTable = new ToolsTable();
 //        $objTable->set_csv(True);
@@ -1620,14 +1620,14 @@ ORDER BY nations.name, areas.name";
             $objTable->add_item($row->contact_tel1);
             $objTable->add_item($row->contact_tel2);
             $objTable->add_item($row->contact_email);
-//            $link = $this->objHelper->buildLink($target . $this->objHelper::convert_to_ASCII($row->Group), $row->Number);
+//            $link = $this->toolsHelper->buildLink($target . $this->toolsHelper::convert_to_ASCII($row->Group), $row->Number);
 //            $objTable->add_item($link);
             $objTable->generate_line();
         }
         $objTable->generate_table();
 // showGroupFollowers
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     function walksFollowers() {
@@ -1676,9 +1676,9 @@ ORDER BY nations.name, areas.name";
         ToolsHelper::selectScope($this->scope, $target);
         echo '<br>';
 //        echo $sql;
-        $this->objHelper->showQuery($sql);
+        $this->toolsHelper->showQuery($sql);
         $target = "index.php?option=com_ra_walks&view=reports";
-        echo $this->objHelper->backButton($target);
+        echo $this->toolsHelper->backButton($target);
     }
 
     /*

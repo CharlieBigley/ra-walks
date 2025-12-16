@@ -27,7 +27,7 @@ use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
 echo "<!-- Code from ' . __FILE__ . ' -->" . PHP_EOL;
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 $objTable = new ToolsTable();
 ToolBarHelper::title('Walks reports');
 
@@ -51,31 +51,31 @@ $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
         $objTable->add_header('Report,Action', 'grey');
 
         $objTable->add_item("Show Logfile");
-        $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showLogfile", "Go", False, 'red'));
+        $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showLogfile", "Go", False, 'red'));
         $objTable->add_item("");
         $objTable->generate_line();
 
         if (ComponentHelper::isEnabled('com_ra_wf', true)) {
             $objTable->add_item("Count Users");
-            $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.countUsers", "Go", False, 'red'));
+            $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.countUsers", "Go", False, 'red'));
             $objTable->add_item("");
             $objTable->generate_line();
 
             $objTable->add_item("Show Users");
-            $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showUsers", "Go", False, 'red'));
+            $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showUsers", "Go", False, 'red'));
             $objTable->add_item("");
             $objTable->generate_line();
 
             // index.php?option=com_ra_tools&task=reports.showColours
 
             $objTable->add_item("Show Followers");
-            $objTable->add_item($objHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showFollowers", "Go", False, 'red'));
+            $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showFollowers", "Go", False, 'red'));
             $objTable->generate_line();
         }
 
         $objTable->generate_table();
         $target = 'administrator/index.php?option=com_ra_tools&view=dashboard';
-        echo $objHelper->backButton($target);
+        echo $toolsHelper->backButton($target);
         ?>
         <input type="hidden" name="task" value="" />
         <?php echo JHtml::_('form.token'); ?>

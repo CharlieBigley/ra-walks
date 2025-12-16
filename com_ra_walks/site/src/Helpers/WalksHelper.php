@@ -26,7 +26,7 @@ class WalksHelper {
 
     protected $db;
     protected $item;
-    protected $objHelper;
+    protected $toolsHelper;
     public $id;
     public $count_followers;
     public $error;
@@ -38,7 +38,7 @@ class WalksHelper {
         $this->id = 0;
         $this->published = 1;
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
     }
 
     function addFeedback($user_id, $feedback) {
@@ -49,7 +49,7 @@ class WalksHelper {
         $sql = 'SELECT id FROM #__ra_walks_feedback WHERE record_type=1 ';
         $sql .= 'AND user_id=' . $user_id . ' AND walk_id=' . $this->id;
 //            echo $sql . "<br>";
-        $count = $this->objHelper->getValue($sql);
+        $count = $this->toolsHelper->getValue($sql);
 
         if ($count > 0) {
             $sql = "UPDATE #__ra_walks_feedback ";
@@ -68,7 +68,7 @@ class WalksHelper {
             $sql .= $this->db->quote($feedback) . ')';
 //            echo $sql;
         }
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
     }
 
     function addPhoto($user_id, $height, $width, $source, $filename, $caption) {
@@ -88,7 +88,7 @@ class WalksHelper {
         $sql .= $this->db->quote($height) . ',';
         $sql .= $this->db->quote($width) . ')';
 //       echo $sql;
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
     }
 
     function countEmails() {
@@ -96,7 +96,7 @@ class WalksHelper {
         $sql .= "from #__ra_wf_emails ";
         $sql .= "where walk_id=" . $this->id;
 //        echo $sql;
-        return $this->objHelper->getValue($sql);
+        return $this->toolsHelper->getValue($sql);
     }
 
     function countFeedback() {// Total number of records (text plus photos)
@@ -105,14 +105,14 @@ class WalksHelper {
 // $sql .= "INNER JOIN #__ra_walks AS walks on feedback.walk_id = walks.id ";
         $sql .= "where walk_id=" . $this->id;
 //        echo $sql;
-        return $this->objHelper->getValue($sql);
+        return $this->toolsHelper->getValue($sql);
     }
 
     function countFollowers() {
         $sql = "SELECT count(id) as followers ";
         $sql .= "from #__ra_walks_follow as walk_follow ";
         $sql .= "WHERE walk_follow.walk_id=" . $this->id;
-        $this->count_followers = $this->objHelper->getValue($sql);
+        $this->count_followers = $this->toolsHelper->getValue($sql);
         return $this->count_followers;
     }
 
@@ -135,7 +135,7 @@ class WalksHelper {
         $sql = "SELECT COUNT(id) FROM #__ra_walks_feedback  ";
         $sql .= "WHERE record_type =2 AND walk_id=" . $this->item->id;
 //        echo $sql;
-        return $this->objHelper->getValue($sql);
+        return $this->toolsHelper->getValue($sql);
     }
 
     function decode($token, &$walk_id, &$user_id, &$id, &$days, &$mode, $debug = False) {
@@ -196,11 +196,11 @@ class WalksHelper {
     function delete($id) {
         $sql = "DELETE FROM #__ra_walks_feedback WHERE walk_id=$id";
 //        echo $sql . '<br>';
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
 
         $sql = "DELETE FROM #__ra_walks_follow WHERE walk_id=$id";
 //        echo $sql . '<br>';
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
     }
 
     function deleteById($id) {
@@ -264,10 +264,10 @@ class WalksHelper {
         $this->walk_id = $walk_id;
         $sql = "SELECT id FROM #__ra_walks WHERE walk_id=" . $walk_id;
 //        echo $sql;
-        $this->id = $this->objHelper->getValue($sql);
+        $this->id = $this->toolsHelper->getValue($sql);
         if ($this->id == 0) {
             $this->walk_id = $walk_id;
-            $this->error = $this->objHelper->error;
+            $this->error = $this->toolsHelper->error;
             return 0;
         }
 //        echo "checkExists: id=" . $this->id . "<br>";
@@ -283,7 +283,7 @@ class WalksHelper {
             return 0;
         }
         $sql = "SELECT id FROM #__ra_profiles WHERE ra_display_name ='" . $this->item->contact_display_name . "'";
-        $id = $this->objHelper->getValue($sql);
+        $id = $this->toolsHelper->getValue($sql);
         if ($id == 0) {
             return 0;
         } else {
@@ -353,7 +353,7 @@ class WalksHelper {
     }
 
     function feedbackButton($encoded) {
-        return $this->objHelper->buildLink("components/com_ra-wf/feedback.php?ref=" . $encoded, "Feedback", false, "link-button button-p0555");
+        return $this->toolsHelper->buildLink("components/com_ra-wf/feedback.php?ref=" . $encoded, "Feedback", false, "link-button button-p0555");
     }
 
     function followWalk($id, $user_id) {
@@ -362,7 +362,7 @@ class WalksHelper {
 //        $this->getData();
         $sql = "SELECT id FROM #__ra_walks_follow WHERE user_id=$user_id AND walk_id=$id";
 //echo $sql . "<br>";
-        $follow_id = $this->objHelper->getValue($sql);
+        $follow_id = $this->toolsHelper->getValue($sql);
         if ($follow_id > 0) {
             $this->message = 'Already following this walk led by ' . $this->item->contact_display_name . ' on ' . $this->get_walk_date();
             return 0;
@@ -388,7 +388,7 @@ class WalksHelper {
 
 //        $sql = "INSERT INTO #__ra_walks_follow (walk_id, user_id) values ($id, $user_id)";
 //        echo $sql;
-//        if (!$this->objHelper->executeCommand($sql)) {
+//        if (!$this->toolsHelper->executeCommand($sql)) {
 //            return 0;
 //        }
         $this->message = 'You are now following the walk led by ' . $this->item->contact_display_name . ' on ' . $this->get_walk_date();
@@ -419,7 +419,7 @@ class WalksHelper {
         } else {
             $target .= 'W' . abs($longitude);
         }
-        return $this->objHelper->imageButton("I", $target, True);
+        return $this->toolsHelper->imageButton("I", $target, True);
     }
 
     function getWalkDetails() {
@@ -501,7 +501,7 @@ class WalksHelper {
             $new_window = false;
         }
 //        echo ' ' . $target . '<br>';
-        $message .= $this->objHelper->imageButton("E", $target, $new_window);
+        $message .= $this->toolsHelper->imageButton("E", $target, $new_window);
 //        echo ' ' . $target . '<br>';
         return 1;
     }
@@ -524,7 +524,7 @@ class WalksHelper {
             $new_window = false;
         }
         echo ' ' . $this->item->email . '<br>';
-        $message .= $this->objHelper->imageButton("E", $target, $new_window);
+        $message .= $this->toolsHelper->imageButton("E", $target, $new_window);
 //        echo ' ' . $target . '<br>';
         return $message;
     }
@@ -566,9 +566,9 @@ class WalksHelper {
     function getDescription($walk_id) {
         $sql = "SELECT date_format(walk_date,'%a %e') as Date, title ";
         $sql .= "FROM #__ra_walks where walk_id = " . $walk_id;
-        $item = $this->objHelper->getItem($sql);
+        $item = $this->toolsHelper->getItem($sql);
         if (empty($item)) {
-            $this->error = $this->objHelper->error;
+            $this->error = $this->toolsHelper->error;
             return 0;
         }
         return $item->Date . ': ' . $item->title;
@@ -581,7 +581,7 @@ class WalksHelper {
         } else {
             $sql = 'SELECT comment FROM #__ra_walks_feedback WHERE walk_id=' . $this->id;
             $sql .= ' AND record_type = 1 AND user_id=' . $user_id;
-            return $this->objHelper->getValue($sql);
+            return $this->toolsHelper->getValue($sql);
         }
     }
 
@@ -644,7 +644,7 @@ class WalksHelper {
             $sql .= "WHERE walk_follow.walk_id=" . $this->id;
             $sql .= " ORDER by profile.preferred_name";
 //       echo $sql;
-            return $this->objHelper->getRows($sql);
+            return $this->toolsHelper->getRows($sql);
         } else {
             return array();
         }
@@ -653,7 +653,7 @@ class WalksHelper {
     function getGroupname() {
         $sql = "SELECT name FROM  #__ra_groups ";
         $sql .= "where code='" . $this->item->group_code . "'";
-        return $this->objHelper->getValue($sql);
+        return $this->toolsHelper->getValue($sql);
     }
 
     function getLeaderEmail() {
@@ -666,7 +666,7 @@ class WalksHelper {
             if ($objProfile->getData()) {
                 return $objProfile->get_email();
             } else {
-                $this->message = $this->objHelper->message;
+                $this->message = $this->toolsHelper->message;
                 return '';
             }
         }
@@ -705,7 +705,7 @@ class WalksHelper {
             $target = "https://www.google.com/maps?q=";
             $target .= $this->item->meeting_latitude;
             $target .= "," . $this->item->meeting_longitude;
-            $message = $this->objHelper->imageButton("GO", $target, True);
+            $message = $this->toolsHelper->imageButton("GO", $target, True);
             return $message;
         }
     }
@@ -742,7 +742,7 @@ class WalksHelper {
             $target = "https://www.google.com/maps?q=";
             $target .= $this->item->start_latitude;
             $target .= "," . $this->item->start_longitude;
-            $message = $this->objHelper->imageButton("GO", $target, True);
+            $message = $this->toolsHelper->imageButton("GO", $target, True);
             return $message;
         }
     }
@@ -761,7 +761,7 @@ class WalksHelper {
         $sql = 'INSERT INTO #__ra_wf_emails (walk_id, record_type, user_id) VALUES(';
         $sql .= $this->id . ",'" . $record_type . "'," . $user_id . ')';
 //        echo "$sql<br>";
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
     }
 
     /*
@@ -778,7 +778,7 @@ class WalksHelper {
         $sql .= $q . (int) $ref . $q;
         $sql .= "," . $q . $message . $q . ")";
 //        echo $sql;
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
     }
 
     function notify() {
@@ -790,8 +790,8 @@ class WalksHelper {
         $sql .= "WHERE ra_group_code > '' ";
         $sql .= "AND min_miles <=" . $this->item->distance_miles . " AND max_miles >=" . $this->item->distance_miles;
 //        echo $sql . "<br>";
-//        $this->objHelper->showQuery($sql);
-        $rows = $this->objHelper->getRows($sql);
+//        $this->toolsHelper->showQuery($sql);
+        $rows = $this->toolsHelper->getRows($sql);
 //        if (empty($this->rows)) {
 //            return 0;
 //        }
@@ -818,9 +818,9 @@ class WalksHelper {
         $sql .= 'WHERE u.email="' . $to_email . '"';
 
         echo $sql . '<br>';
-        echo 'response (' . $this->objHelper->getValue($sql) . ')<br>';
+        echo 'response (' . $this->toolsHelper->getValue($sql) . ')<br>';
 
-        if ($this->objHelper->getValue($sql) == false) {
+        if ($this->toolsHelper->getValue($sql) == false) {
             Factory::getApplication()->enqueueMessage($to_email . ' has opted out of emails', 'notice');
             return 0;
         }
@@ -917,7 +917,7 @@ class WalksHelper {
                     $target = $website_base . "components/com_ra_wf/process_email.php?ref=";
                     $body .= $this->buildLink($target . $token, 'View Blog', true) . '<br>';
                     $to_email = $follower->email;
-                    if ($this->objHelper->isSuperuser()) {
+                    if ($this->toolsHelper->isSuperuser()) {
                         $this->message .= $to_email . ", ";
                     }
                     $response = $this->sendEmail($to_email, $subject, $body);
@@ -938,7 +938,7 @@ class WalksHelper {
                 foreach ($followers as $follower) {
                     $to_email = $follower->email;
                     $this->logEmail($email_type, $follower->user_id);
-                    if ($this->objHelper->isSuperuser()) {
+                    if ($this->toolsHelper->isSuperuser()) {
                         $this->message .= $to_email . ", ";
                     }
                     $response = $this->sendEmail($to_email, $subject, $body);
@@ -956,7 +956,7 @@ class WalksHelper {
                 foreach ($followers as $follower) {
                     $to_email = $follower->email;
                     $this->logEmail($email_type, $follower->user_id);
-                    if ($this->objHelper->isSuperuser()) {
+                    if ($this->toolsHelper->isSuperuser()) {
                         $this->message .= $to_email . ", ";
                     }
                     $response = $this->sendEmail($to_email, $subject, $body);
@@ -1217,7 +1217,7 @@ class WalksHelper {
         $this->id = $id;
         $sql = "SELECT COUNT(id) FROM #__ra_walks_follow WHERE user_id=$user_id AND walk_id=$id";
 
-        $num_rows = $this->objHelper->getValue($sql);
+        $num_rows = $this->toolsHelper->getValue($sql);
 //        echo $sql . "<br>rows=$num_rows<br>";
         if ($num_rows == 0) {
             $this->message = 'You are not following the walk led by ' . $this->item->contact_display_name . ' on ' . $this->getDate();
@@ -1227,7 +1227,7 @@ class WalksHelper {
             return 0;
         }
         $sql = "DELETE FROM #__ra_walks_follow WHERE user_id=$user_id AND walk_id=$id";
-        $this->objHelper->executeCommand($sql);
+        $this->toolsHelper->executeCommand($sql);
         $this->message = 'You are no longer following the walk led by ' . $this->item->contact_display_name . ' on ' . $this->getDate();
 
 // Notify the leader

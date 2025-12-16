@@ -28,7 +28,7 @@ class MergeHelper {
     protected $db;
     protected $dbExternal;
     protected $app;
-    protected $objHelper;
+    protected $toolsHelper;
     private $walksfound = 0;
     private $walksupdated = 0;
     private $counter = 0;
@@ -37,7 +37,7 @@ class MergeHelper {
     public function __construct() {
 
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
         $this->app = Factory::getApplication();
     }
 
@@ -46,7 +46,7 @@ class MergeHelper {
 
         $sql = 'SELECT id FROM #__ra_walks WHERE walk_id' . (int) $walkid;
 
-        $results = $this->objHelper->getValue($sql);
+        $results = $this->toolsHelper->getValue($sql);
 
 // See if we got anything back - ie does the walk exist
         if (count($results) == 0) {
@@ -123,7 +123,7 @@ class MergeHelper {
         $sql .= 'SELECT code from #__ra_areas ';
         $sql .= ' ORDER BY code';
 
-        $rows = $this->objHelper->getRows($sql);
+        $rows = $this->toolsHelper->getRows($sql);
         foreach ($rows as $row) {
             $message = 'Processing ' . $row->code . ' ';
             $walks = $this->getWalksData($row->code);

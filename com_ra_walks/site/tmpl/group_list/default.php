@@ -17,7 +17,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
@@ -73,17 +73,17 @@ if (empty($this->items)) {
 
     $n = count($this->items);
     foreach ($this->items as $i => $item) {
-        $group_count = $objHelper->getValue('SELECT COUNT(id) FROM #__ra_groups WHERE code LIKE "' . $item->code . '%"');
+        $group_count = $toolsHelper->getValue('SELECT COUNT(id) FROM #__ra_groups WHERE code LIKE "' . $item->code . '%"');
         echo "<tr>";
         echo "<td>" . $item->code . "</td>";
         echo "<td>" . $item->name . "</td>";
         echo "<td>" . $item->area . "</td>";
-        echo '<td>' . $objHelper->showLocation($item->latitude, $item->longitude, 'O') . '</td>';
+        echo '<td>' . $toolsHelper->showLocation($item->latitude, $item->longitude, 'O') . '</td>';
         echo '<td>';
         if ($item->website == "") {
             echo '<br>';
         } else {
-            echo $objHelper->buildLink($item->website, $item->website, True, "");
+            echo $toolsHelper->buildLink($item->website, $item->website, True, "");
         }
         echo '</td>';
 
@@ -91,18 +91,18 @@ if (empty($this->items)) {
         if ($item->co_url == "") {
             echo '<br>';
         } else {
-            echo $objHelper->buildLink($item->co_url, $item->co_url, True, "");
+            echo $toolsHelper->buildLink($item->co_url, $item->co_url, True, "");
         }
         echo '</td>';
 
-//        echo '<td>' . $objHelper->buildLink($target_radius . $item->code, 'Walks', true) . '</td>';
+//        echo '<td>' . $toolsHelper->buildLink($target_radius . $item->code, 'Walks', true) . '</td>';
         if ($com_ra_walks) {
             echo "<td>";
             $sql = "Select count(walks.id) from #__ra_walks as walks ";
             $sql .= "Where walks.group_code='" . $item->code . "'";
-            $count_walks = $objHelper->getValue($sql);
+            $count_walks = $toolsHelper->getValue($sql);
             if ($count_walks > 0) {
-                echo $count_walks . $objHelper->imageButton("I", $target_reports . "&scope=A&group_code=" . $item->code);
+                echo $count_walks . $toolsHelper->imageButton("I", $target_reports . "&scope=A&group_code=" . $item->code);
             }
             echo "</td>";
 
@@ -111,10 +111,10 @@ if (empty($this->items)) {
             $sql .= "Where walks.group_code='" . $item->code . "'";
             $sql .= "AND (datediff(walk_date, CURRENT_DATE) >= 0) ";
             $sql .= "AND (state=1) ";
-            $count_walks = $objHelper->getValue($sql);
+            $count_walks = $toolsHelper->getValue($sql);
             if ($count_walks > 0) {
-                echo $count_walks . $objHelper->imageButton("I", $target_reports . "&scope=F&group_code=" . $item->code);
-                //               echo$objHelper->buildLink("index.php?option=com_ra_walks&view=reports_group&group_code=" . $item->code . '&scope=F', $count_walks);
+                echo $count_walks . $toolsHelper->imageButton("I", $target_reports . "&scope=F&group_code=" . $item->code);
+                //               echo$toolsHelper->buildLink("index.php?option=com_ra_walks&view=reports_group&group_code=" . $item->code . '&scope=F', $count_walks);
             }
             echo "</td>";
         }

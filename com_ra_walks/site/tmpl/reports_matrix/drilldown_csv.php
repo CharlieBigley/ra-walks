@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 
-$objHelper = new RamblersHelper;
+$toolsHelper = new RamblersHelper;
 $objApp = JFactory::getApplication();
 
 echo "<h2>Extract CSV</h2>";
@@ -52,7 +52,7 @@ try {
         $link = $target . '&row=Y&row_value=' . RamblersHelper::convert_to_ASCII($row->yyyy);
         $link .= '&col=YM&col_value=' . RamblersHelper::convert_to_ASCII($row->mm);
         //            echo $link . '<br>';
-        $objTable->add_item($row->record_count . $objHelper->imageButton('DD', $link, false, "link-button button-p5565"));
+        $objTable->add_item($row->record_count . $toolsHelper->imageButton('DD', $link, false, "link-button button-p5565"));
 //      $objTable->add_item($row->b);
         $total = $total + $row->record_count;
         $objTable->generate_line();
@@ -76,5 +76,5 @@ if ($this->mode == 'A') {
     $target .= 'reports_group&group_code=';
 }
 $target .= $this->opt;
-echo $objHelper->backButton($target);
+echo $toolsHelper->backButton($target);
 

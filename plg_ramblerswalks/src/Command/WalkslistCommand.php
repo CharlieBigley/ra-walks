@@ -9,7 +9,7 @@
  * 16/12/24 CB created from WalksloadCommand
  * 17/12/24 CB return 1 from doExecute
  * 21/12/24 CB show totals by state
- * 23/12/24 CB use this->objHelper
+ * 23/12/24 CB use this->toolsHelper
  * 06/01/25 CB send result as email
  * 07/01/25 CB add dependencies
  */
@@ -55,7 +55,7 @@ class WalkslistCommand extends AbstractCommand {
      * @since 4.0.0
      */
     private $ioStyle;
-    private $objHelper;
+    private $toolsHelper;
 
     /**
      * Instantiate the command.
@@ -97,7 +97,7 @@ class WalkslistCommand extends AbstractCommand {
 
         $this->setDescription('Called by cron to list summary of walks.');
         $this->setHelp($help);
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
     }
 
     /**
@@ -114,24 +114,24 @@ class WalkslistCommand extends AbstractCommand {
         $this->configureIO($input, $output);
 
         $sql = 'SELECT COUNT(id) FROM #__ra_walks';
-        $this->ioStyle->comment("Total number of walks is " . number_format($this->objHelper->getValue($sql)));
-        $body = "Total number of walks is " . number_format($this->objHelper->getValue($sql)) . '<br>';
+        $this->ioStyle->comment("Total number of walks is " . number_format($this->toolsHelper->getValue($sql)));
+        $body = "Total number of walks is " . number_format($this->toolsHelper->getValue($sql)) . '<br>';
 
         $sql = 'SELECT COUNT(id) FROM #__ra_walks WHERE state=1';
-        $this->ioStyle->comment("Total number of published walks is " . number_format($this->objHelper->getValue($sql)));
-        $body .= "Total number of published walks is " . number_format($this->objHelper->getValue($sql)) . '<br>';
+        $this->ioStyle->comment("Total number of published walks is " . number_format($this->toolsHelper->getValue($sql)));
+        $body .= "Total number of published walks is " . number_format($this->toolsHelper->getValue($sql)) . '<br>';
 
         $sql = 'SELECT COUNT(id) FROM #__ra_walks WHERE state=0';
-        $this->ioStyle->comment("Total number of unpublished walks is " . number_format($this->objHelper->getValue($sql)));
-        $body .= "Total number of unpublished walks is " . number_format($this->objHelper->getValue($sql)) . '<br>';
+        $this->ioStyle->comment("Total number of unpublished walks is " . number_format($this->toolsHelper->getValue($sql)));
+        $body .= "Total number of unpublished walks is " . number_format($this->toolsHelper->getValue($sql)) . '<br>';
 
         $sql = 'SELECT MIN(walk_date) FROM #__ra_walks';
-        $this->ioStyle->comment("Earliest walk is for " . $this->objHelper->getValue($sql));
-        $body .= "Earliest walk is for " . $this->objHelper->getValue($sql) . '<br>';
+        $this->ioStyle->comment("Earliest walk is for " . $this->toolsHelper->getValue($sql));
+        $body .= "Earliest walk is for " . $this->toolsHelper->getValue($sql) . '<br>';
 
         $sql = 'SELECT MAX(walk_date) FROM #__ra_walks';
-        $this->ioStyle->comment("Latest walk is for " . $this->objHelper->getValue($sql));
-        $body .= "Latest walk is for " . $this->objHelper->getValue($sql) . '<br>';
+        $this->ioStyle->comment("Latest walk is for " . $this->toolsHelper->getValue($sql));
+        $body .= "Latest walk is for " . $this->toolsHelper->getValue($sql) . '<br>';
 
         $this->ioStyle->comment($body);
         /*

@@ -41,12 +41,12 @@ class AreaController extends FormController {
         $callback = $app->getUserState('com_ra_wf.callback', 'walk_list');
         $code = $app->input->getCmd('code', 'NAT');
 
-        $objHelper = new ToolsHelper;
+        $toolsHelper = new ToolsHelper;
         $objTable = new ToolsTable();
 
         echo "<h2>Total walks by Group";
         if (strlen($code) == 2) {
-            echo ' for ' . $this->objHelper->lookupArea($code);
+            echo ' for ' . $this->toolsHelper->lookupArea($code);
         }
         echo "</h2>";
 
@@ -59,7 +59,7 @@ class AreaController extends FormController {
         $sql .= 'GROUP BY group_code ';
         $sql .= 'ORDER BY group_code ';
 //        echo $sql;
-        $rows = $objHelper->getRows($sql);
+        $rows = $toolsHelper->getRows($sql);
         $total_walks = 0;
         foreach ($rows as $row) {
             $objTable->add_item($row->group_code);
@@ -71,15 +71,15 @@ class AreaController extends FormController {
         echo number_format($total_walks) . ' Walks<br>';
         // Depending on from where it was invoked, control will be passed back either to reports or to reports_area
 
-        echo $objHelper->backButton('index.php?option=com_ra_wf&view=' . $callback);
+        echo $toolsHelper->backButton('index.php?option=com_ra_wf&view=' . $callback);
     }
 
     private function debug($code) {
-        $objHelper = new ToolsHelper;
+        $toolsHelper = new ToolsHelper;
         $sql = "SELECT COUNT(id) FROM #__ra_walks  ";
         $sql .= "WHERE group_code = '" . $row->code . "'";
 //            echo $sql;
-        $count_walks = $objHelper->getValue($sql);
+        $count_walks = $toolsHelper->getValue($sql);
         echo $sql . ' ' . $count_walks . '<br>';
     }
 
@@ -257,21 +257,21 @@ class AreaController extends FormController {
 
     public function refreshWalks() {
         // Invoked from option=com_ra_walks&view=area
-        $objHelper = new ToolsHelper;
-//        $objHelper->executeCommand('DELETE FROM #__ra_walks');
+        $toolsHelper = new ToolsHelper;
+//        $toolsHelper->executeCommand('DELETE FROM #__ra_walks');
         $code = Factory::getApplication()->input->getCmd('code', 'NS03');
-        $name = $objHelper->lookupGroup($code);
+        $name = $toolsHelper->lookupGroup($code);
         echo "Walks for $code $name<br>";
         $walklist = $this->getJson('group-walk', 'groups=' . $code);
         $this->processwalks($walklist);
         echo "Walks created = $this->walkscreated<br>";
         echo "Walks updated = $this->walksupdated <br>";
         $target = "index.php?option=com_ra_walks&view=area&code=" . substr($code, 0, 2);
-        echo $objHelper->backButton($target);
+        echo $toolsHelper->backButton($target);
         $url = 'https://walks-manager.ramblers.org.uk/api/volunteers/walksevents?types=group-walk';
         $url .= '&api-key=742d93e8f409bf2b5aec6f64cf6f405e';
         $url .= '&groups=' . $code;
-        echo $objHelper->buildLink($url, "Show feed", true, "link-button button-p0159");
+        echo $toolsHelper->buildLink($url, "Show feed", true, "link-button button-p0159");
     }
 
     private function validate($walk) {

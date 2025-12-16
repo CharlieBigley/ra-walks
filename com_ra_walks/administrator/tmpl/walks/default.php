@@ -31,7 +31,7 @@ $userId = $user->get('id');
 $listOrder = $this->state->get('list.ordering');
 $listDirn = $this->state->get('list.direction');
 $canOrder = $user->authorise('core.edit.state', 'com_ra_walks');
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 ?>
 
 <form action="<?php echo Route::_('index.php?option=com_ra_walks&view=walks'); ?>" method="post"
@@ -108,7 +108,7 @@ $objHelper = new ToolsHelper;
                             echo '<td>' . $item->group_code . '</td>' . PHP_EOL;
                             if ($canEdit) {
                                 $target = 'administrator/index.php?option=com_ra_walks&view=walk&layout=edit&id=' . $item->id;
-                                echo '<td>' . $objHelper->buildLink($target, $item->title) . '</td>' . PHP_EOL;
+                                echo '<td>' . $toolsHelper->buildLink($target, $item->title) . '</td>' . PHP_EOL;
                             } else {
                                 echo '<td>' . $item->title . '</td>' . PHP_EOL;
                             }

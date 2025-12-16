@@ -73,7 +73,7 @@ class HtmlView extends BaseHtmlView {
     }
 
     public function generateEmail($contact_id, $name, $website) {
-        $objHelper = new ToolsHelper;
+        $toolsHelper = new ToolsHelper;
         if ($contact_id == "0") {
 
             if (substr($website, 0, 27) == 'https://www.ramblers.org.uk') {
@@ -96,7 +96,7 @@ class HtmlView extends BaseHtmlView {
             return $chair;
         } else {
             $link = 'index.php?option=com_contact&view=contact&id=' . $contact_id;
-            return $objHelper->buildLink($link, $name, True, "");
+            return $toolsHelper->buildLink($link, $name, True, "");
             //return $link;
         }
     }

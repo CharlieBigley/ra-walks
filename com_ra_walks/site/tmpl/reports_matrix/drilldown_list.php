@@ -25,7 +25,7 @@ use Joomla\CMS\Factory;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 $objApp = JFactory::getApplication();
 echo "<h2>Walks Drilldown detail" . "</h2>";
 echo "<h4>Scope=" . $this->scope_desc . ', ' . $this->criteria;
@@ -102,7 +102,7 @@ try {
             $details .= $row->start_time;
         }
         $objTable->add_item($details);
-        $objTable->add_item($objHelper->buildLink($target_info . $row->id, $row->title, True));
+        $objTable->add_item($toolsHelper->buildLink($target_info . $row->id, $row->title, True));
 //        $objTable->add_item($row->title);
         $objTable->add_item($row->group_code);
         $objTable->add_item($row->difficulty);
@@ -136,5 +136,5 @@ if (!$this->callback == '') {
     $back = 'index.php?option=com_ra_walks&view=reports_matrix';
 }
 
-echo $objHelper->backButton($back);
+echo $toolsHelper->backButton($back);
 ?>

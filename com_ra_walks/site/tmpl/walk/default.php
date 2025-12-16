@@ -31,7 +31,7 @@ if (!$canEdit && Factory::getApplication()->getIdentity()->authorise('core.edit.
 }
 //==================================================================
 $JsonHelper = new JsonHelper;
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 $objTable = new ToolsTable;
 $objWalk = new WalkHelper($this->item);
 $objTable->add_column("Walk ID", "R");
@@ -53,7 +53,7 @@ if ($walks_follow) {
     }
 }
 // Determine the id of the current user, and if SuperUser
-$isSuperuser = $objHelper->isSuperuser();
+$isSuperuser = $toolsHelper->isSuperuser();
 
 $details = $walk_id;
 if ($days_to_go > 0) {
@@ -69,7 +69,7 @@ $objTable->generate_header();
 
 $objTable->add_item("Group ");
 $group_code = $this->item->group_code;
-$details = $group_code . ' ' . $objHelper->lookupGroup($group_code);
+$details = $group_code . ' ' . $toolsHelper->lookupGroup($group_code);
 $objTable->add_item($details);
 $objTable->generate_line();
 
@@ -257,4 +257,4 @@ if ($this->callback == 'walks') {
 //  the return destination may have been set up in user state
     $back = Factory::getApplication()->getUserState('com_ra_walks.callback_list', '');
 }
-echo $objHelper->backButton($back);
+echo $toolsHelper->backButton($back);

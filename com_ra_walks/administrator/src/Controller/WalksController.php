@@ -34,7 +34,7 @@ class WalksController extends AdminController {
 
     protected $db;
     protected $app;
-    protected $objHelper;
+    protected $toolsHelper;
     private $walksfound = 0;
     private $walksupdated = 0;
     private $walkscreated = 0;
@@ -43,7 +43,7 @@ class WalksController extends AdminController {
     public function __construct() {
         parent::__construct();
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
         $this->app = Factory::getApplication();
         $this->back = 'administrator/index.php?option=com_ra_tools&view=reports';
         $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
@@ -140,8 +140,8 @@ class WalksController extends AdminController {
                 echo $comment . '<br>';
             }
         }
-        echo $this->objHelper->buildButton('administrator/index.php?option=com_ra_walks&task=reports.showLogfile', "Show Logfile", False, 'grey');
-        echo $this->objHelper->backButton('administrator/index.php?option=com_ra_walks&view=reports');
+        echo $this->toolsHelper->buildButton('administrator/index.php?option=com_ra_walks&task=reports.showLogfile', "Show Logfile", False, 'grey');
+        echo $this->toolsHelper->backButton('administrator/index.php?option=com_ra_walks&view=reports');
     }
 
     /**

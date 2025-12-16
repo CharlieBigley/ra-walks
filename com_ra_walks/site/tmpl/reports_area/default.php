@@ -19,7 +19,7 @@ use Joomla\CMS\Factory;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 // set callback in globals so reports can return as appropriate
 Factory::getApplication()->setUserState('com_ra_tools.callback', 'reports_area');
 //die('template');
@@ -41,7 +41,7 @@ if ($this->area == 'NAT') {
         $sql .= 'WHERE ' . $this->criteria_sql;
     }
 } else {
-    $area_name = $objHelper->getValue("SELECT name FROM #__ra_areas where code='" . $this->area . "' ");
+    $area_name = $toolsHelper->getValue("SELECT name FROM #__ra_areas where code='" . $this->area . "' ");
     echo "<h2>" . 'Area=' . $this->area . ' ' . $area_name . "</h2>";
     $sql .= "WHERE group_code LIKE '" . $this->area . "%' ";
     if (!$this->criteria_sql == '') {
@@ -50,10 +50,10 @@ if ($this->area == 'NAT') {
 }
 
 $target = "index.php?option=com_ra_walks&view=reports_area&area=" . $this->area;
-$objHelper->selectScope($this->scope, $target);
+$toolsHelper->selectScope($this->scope, $target);
 
 //echo "$sql<br>";
-echo '<p>Total number of walks in scope=<b>' . number_format($objHelper->getValue($sql)) . '</b><i>';
+echo '<p>Total number of walks in scope=<b>' . number_format($toolsHelper->getValue($sql)) . '</b><i>';
 if ($this->scope == "F") {              // Future walks
     echo ' (this includes all walks on or after today, that have not been cancelled in WM)';
 } elseif ($this->scope == "A") {
@@ -85,41 +85,41 @@ if ($this->area == 'NAT') {
     $opt = 'G';
 }
 $target = $this->buildTarget($opt, 'Dif');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget($opt, 'W');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget($opt, 'L');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget($opt, 'P');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $objTable->generate_line('');
 
 $objTable->add_item('Miles');
 $target = $this->buildTarget('MR', 'Dif');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('MR', 'W');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('MR', 'L');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('MR', 'P');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $objTable->generate_line('');
 
 $objTable->add_item('Pace');
 $target = $this->buildTarget('P', 'Dif');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('P', 'W');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('P', 'L');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $objTable->add_item('' . " ");
 $objTable->generate_line('');
 
 $objTable->add_item('Grade');
 $target = $this->buildTarget('L', 'Dif');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('L', 'W');
-$objTable->add_item($objHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $objTable->add_item('' . " ");
 $objTable->add_item('' . " ");
 $objTable->generate_line('');
@@ -132,55 +132,55 @@ $self = 'index.php?option=com_ra_walks&view=reports_area&area=' . $this->area . 
 $callback = ToolsHelper::convert_to_ASCII($self);
 
 $target = $this->buildTarget('Y', 'YM') . '&callback=' . $callback;
-echo 'Year/Month ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+echo 'Year/Month ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 
 if ($this->scope == "A") {
     if ($this->area == 'NAT') {
         $target = $this->buildTarget('A', 'S') . '&callback=' . $callback;
-        echo 'Area/Status ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+        echo 'Area/Status ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
     } else {
         $target = $this->buildTarget('G', 'S') . '&callback=' . $callback;
-        echo 'Group/Status ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+        echo 'Group/Status ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
     }
 }
 if ($this->area == 'NAT') {
     $target = 'index.php?option=com_ra_walks&limit=20&mode=M&scope=' . $this->scope . '&task=reports.';
 //    $target = 'index.php?option=com_ra_walks&task=reports.showTopLeaders&limit=20&mode=M&scope=' . $this->scope;
-    echo 'Top walk leaders ' . $objHelper->imageButton('I', $target . 'showTopLeaders', false, "link-button button-p5565") . '<br>';
+    echo 'Top walk leaders ' . $toolsHelper->imageButton('I', $target . 'showTopLeaders', false, "link-button button-p5565") . '<br>';
 
-    echo 'Top Areas for walks ' . $objHelper->imageButton('I', $target . 'showTopAreas', false, "link-button button-p5565") . '<br>';
+    echo 'Top Areas for walks ' . $toolsHelper->imageButton('I', $target . 'showTopAreas', false, "link-button button-p5565") . '<br>';
 
-    echo 'Top Groups for walks ' . $objHelper->imageButton('I', $target . 'showTopGroups', false, "link-button button-p5565") . '<br>';
+    echo 'Top Groups for walks ' . $toolsHelper->imageButton('I', $target . 'showTopGroups', false, "link-button button-p5565") . '<br>';
 
-//    echo 'Guest walks' . $objHelper->imageButton('I', $target . 'guestWalks', false, "link-button button-p5565") . '<br>';
-//    echo 'Feed summary' . $objHelper->imageButton('I', $target . 'showFeedSummary', false, "link-button button-p5565") . '<br>';
+//    echo 'Guest walks' . $toolsHelper->imageButton('I', $target . 'guestWalks', false, "link-button button-p5565") . '<br>';
+//    echo 'Feed summary' . $toolsHelper->imageButton('I', $target . 'showFeedSummary', false, "link-button button-p5565") . '<br>';
 } else {
     $target = $this->buildTarget('MR', 'G') . '&callback=' . $callback;
-    echo 'Miles/Group ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+    echo 'Miles/Group ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 
     $target = 'index.php?option=com_ra_walks&task=reports.countWalks&mode=A&code=' . $this->area . '&scope=' . $this->scope;
     $target .= '&callback=reports_area';
-    echo 'Total number of walks by Group ' . $objHelper->imageButton('I', $target, false, 'link-button button-p5565') . '<br>';
+    echo 'Total number of walks by Group ' . $toolsHelper->imageButton('I', $target, false, 'link-button button-p5565') . '<br>';
 
     $target = 'index.php?option=com_ra_walks&task=reports.showTopLeaders&mode=A&opt=' . $this->area . '&scope=' . $this->scope;
     $target .= '&callback=reports_area';
-    echo 'Top walk leaders ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+    echo 'Top walk leaders ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 
 //    $target = "index.php?option=com_ra_walks&task=reports.showFeedSummaryArea&area_code=" . $this->area . '&scope=' . $this->scope;
-//    echo 'Feed summary' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+//    echo 'Feed summary' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 }
 
 //$target = "index.php?option=com_ra_walks&view=reports_matrix&report_type=S&mode=A&opt=" . $this->area . '&scope=' . $this->scope;
-//echo 'Analyse Walk length ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+//echo 'Analyse Walk length ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 // $callback contains ? and =, so we must convert to ASCII
 $callback = ToolsHelper::convert_to_ASCII("index.php?option=com_ra_walks&view=reports_area&area=" . $this->area . '&scope=' . $this->scope);
 $target = "index.php?option=com_ra_walks&task=reports.groupsNoWalks&area=" . $this->area . '&callback=' . $callback;
-echo 'Groups without future walks ' . $objHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+echo 'Groups without future walks ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 
 // If not invoked from the menu, allow retrun to list of Areas
 if ($this->callback != '') {
     $target = "index.php?option=com_ra_walks&view=area_list";
-    echo $objHelper->backButton($target);
+    echo $toolsHelper->backButton($target);
 }
 echo '<p class="text-highlight">';
 echo '"DOW" = Day of week';

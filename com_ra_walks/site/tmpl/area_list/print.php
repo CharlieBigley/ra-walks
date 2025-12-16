@@ -42,7 +42,7 @@ if ($this->nation != '') {
     }
 }
 echo '<h2>' . $heading . '</h2>';
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 
 $objTable = new ToolsTable();
 $objTable->add_header("Code,Name,Chair");
@@ -65,4 +65,4 @@ if ($this->nation != '') {
 }
 
 $target = 'index.php?option=com_ra_tools&task=clusters.show';
-echo $objHelper->backButton($target);
+echo $toolsHelper->backButton($target);

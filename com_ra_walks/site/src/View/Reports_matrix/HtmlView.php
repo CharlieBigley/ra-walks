@@ -50,7 +50,7 @@ class HtmlView extends BaseHtmlView {
      */
     public function display($tpl = null) {
 
-        $objHelper = new ToolsHelper;
+        $toolsHelper = new ToolsHelper;
         $app = Factory::getApplication();
         //        $app->input->set('tmpl', 'component');
 //
@@ -87,7 +87,7 @@ class HtmlView extends BaseHtmlView {
                 } else {
                     if ($this->row != "A") {
                         $this->criteria_sql = "SUBSTRING(walks.group_code,1,2)='" . $this->opt . "' ";
-                        $this->criteria = "Area=" . $objHelper->getValue("SELECT name FROM #__ra_areas where code='" . $this->opt . "' ");
+                        $this->criteria = "Area=" . $toolsHelper->getValue("SELECT name FROM #__ra_areas where code='" . $this->opt . "' ");
                     }
                 }
                 break;
@@ -101,7 +101,7 @@ class HtmlView extends BaseHtmlView {
                 break;
             case ($this->mode == "G");
                 $this->criteria_sql = "walks.group_code='" . $this->opt . "' ";
-                $this->criteria = "Group=" . $objHelper->getValue("SELECT name FROM #__ra_groups where code='" . $this->opt . "' ");
+                $this->criteria = "Group=" . $toolsHelper->getValue("SELECT name FROM #__ra_groups where code='" . $this->opt . "' ");
                 break;
             case ($this->mode == "L");
                 $this->criteria_sql = "walks.local_grade='" . $this->opt . "' ";

@@ -37,7 +37,7 @@ $canDelete = $user->authorise('core.delete', 'com_ra_walks');
 $wa = $this->document->getWebAssetManager();
 $wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
 $target_walk = 'index.php?option=com_ra_walks&view=walk&callback=walks&id=';
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 ?>
 
 <form action="<?php echo htmlspecialchars(Uri::getInstance()->toString()); ?>" method="post"
@@ -119,7 +119,7 @@ $objHelper = new ToolsHelper;
                         echo '<td>' . $item->walk_id . '</td>';
                         echo '<td>';
                         echo $item->walk_date . '' . $item->start_date . '<br>' . $item->start_time . '</td>';
-                        echo '<td>' . $objHelper->buildLink($target_walk . $item->id, $item->title) . '</td>';
+                        echo '<td>' . $toolsHelper->buildLink($target_walk . $item->id, $item->title) . '</td>';
                         echo '<td>' . $item->group_code . '</td>';
                         echo '<td>' . $item->difficulty . '</td>';
                         echo '<td>' . $item->distance_miles . '</td>';

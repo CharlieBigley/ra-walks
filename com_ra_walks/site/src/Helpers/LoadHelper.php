@@ -24,7 +24,7 @@ class LoadHelper {
 
     protected $db;
     protected $app;
-    protected $objHelper;
+    protected $toolsHelper;
     private $walksfound = 0;
     private $walksupdated = 0;
     private $walkscreated = 0;
@@ -40,7 +40,7 @@ class LoadHelper {
     public function __construct() {
 
         $this->db = Factory::getDbo();
-        $this->objHelper = new ToolsHelper;
+        $this->toolsHelper = new ToolsHelper;
         $this->app = Factory::getApplication();
     }
 

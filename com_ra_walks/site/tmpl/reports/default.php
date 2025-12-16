@@ -21,7 +21,7 @@ use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 $app = JFactory::getApplication();
 $user = JFactory::getUser();
 
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 // set callback in globals so reports can return as appropriate
 JFactory::getApplication()->setUserState('com_ra_walks.callback', 'reports');
 echo "<h2>Reports</h2>";
@@ -46,68 +46,68 @@ $objTable->generate_line("");
 
 
 $objTable->add_item("Total walks by Group");
-$objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.countWalks", "Go", False, "link-button button-p0555"));
+$objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.countWalks", "Go", False, "link-button button-p0555"));
 $objTable->generate_line();
 
 $objTable->add_item("Walks by Date");
-$objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksByDate", "Go", False, "link-button button-p0555"));
+$objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksByDate", "Go", False, "link-button button-p0555"));
 $objTable->generate_line();
 
 $objTable->add_item("Groups without walks");
-$objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.groupsNoWalks", "Go", False, "link-button button-p0555"));
+$objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.groupsNoWalks", "Go", False, "link-button button-p0555"));
 $objTable->generate_line();
 
 $objTable->add_item("Download CSV of walk leaders");
-$objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.walkLeaders", "Go", False, "link-button button-p0555"));
+$objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.walkLeaders", "Go", False, "link-button button-p0555"));
 $objTable->generate_line();
 
 $objTable->add_item("Logfile");
-$objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showLogfile&offset=1", "Go", False, "link-button button-p0555"));
+$objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showLogfile&offset=1", "Go", False, "link-button button-p0555"));
 $objTable->generate_line();
 
 // Reports for Walks Follow
 if (ComponentHelper::isEnabled('com_ra_wf', true)) {
     $objTable->add_item("Feedback by Date");
-    $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.countFeedback", "Go", False, "link-button button-p0555"));
+    $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.countFeedback", "Go", False, "link-button button-p0555"));
     $objTable->generate_line();
 
     $objTable->add_item("Followers by date");
-    $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showFollowersByDate", "Go", False, "link-button button-p0555"));
+    $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showFollowersByDate", "Go", False, "link-button button-p0555"));
     $objTable->generate_line();
 
     $objTable->add_item("Recent emails");
-    $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.recentEmails", "Go", False, "link-button button-p0555"));
+    $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.recentEmails", "Go", False, "link-button button-p0555"));
     $objTable->generate_line();
 
     if ($user->id == 0) {
         echo "<b>More reports are available if you log in</b><br>";
     } else {
         $objTable->add_item("Registered walk leaders");
-        $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showRegisteredLeaders", "Go", False, "link-button button-p0555"));
+        $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showRegisteredLeaders", "Go", False, "link-button button-p0555"));
         $objTable->generate_line();
 
         $objTable->add_item("Walks and Followers");
-        $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksFollowers", "Go", False, "link-button button-p0555"));
+        $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksFollowers", "Go", False, "link-button button-p0555"));
         $objTable->generate_line();
 
         $objTable->add_item("Groups and Followers");
-        $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showUserGroups", "Go", False, "link-button button-p0555"));
+        $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showUserGroups", "Go", False, "link-button button-p0555"));
         $objTable->generate_line();
     }
 }
 
 
 //$objTable->add_item("Walks updated");
-//$objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksAudit&offset=1", "Go", False, "link-button button-p0555"));
+//$objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.walksAudit&offset=1", "Go", False, "link-button button-p0555"));
 //$objTable->generate_line();
 
-if ($objHelper->isSuperuser()) {
+if ($toolsHelper->isSuperuser()) {
     $objTable->add_item("Recent feedback");
-    $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.recentFeedback", "Go", False, "link-button button-p0555"));
+    $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.recentFeedback", "Go", False, "link-button button-p0555"));
     $objTable->generate_line();
 
     $objTable->add_item("Users");
-    $objTable->add_item($objHelper->buildLink("index.php?option=com_ra_walks&task=reports.showUsers", "Go", False, "link-button button-p0555"));
+    $objTable->add_item($toolsHelper->buildLink("index.php?option=com_ra_walks&task=reports.showUsers", "Go", False, "link-button button-p0555"));
     $objTable->generate_line();
 }
 

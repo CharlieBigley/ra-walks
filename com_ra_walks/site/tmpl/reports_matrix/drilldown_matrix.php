@@ -29,7 +29,7 @@ use Joomla\CMS\Factory;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
-$objHelper = new ToolsHelper;
+$toolsHelper = new ToolsHelper;
 
 $title = $this->component_params->get('page_title', '');
 echo "<h2>Matrix for  $this->row_type / $this->col_type</h2>";
@@ -213,7 +213,7 @@ foreach ($records as $record) {
             if ($debug) {
                 echo $link . '<br>';
             }
-            $objTable->add_item($objHelper->buildLink($link, number_format($record->record_count)));
+            $objTable->add_item($toolsHelper->buildLink($link, number_format($record->record_count)));
         }
         $col_pointer++;
         $row_total += $record->record_count;
@@ -265,5 +265,5 @@ if ($this->mode == 'A') {
     $back .= 'reports_group&group_code=';
 }
 $back .= $this->opt;
-echo $objHelper->backButton($back);
+echo $toolsHelper->backButton($back);
 
