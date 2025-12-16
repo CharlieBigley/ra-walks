@@ -22,7 +22,6 @@ use Joomla\CMS\Router\Route;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
-echo "<!-- Code from ' . __FILE__ . ' -->" . PHP_EOL;
 $toolsHelper = new ToolsHelper;
 $objTable = new ToolsTable();
 ToolBarHelper::title('Walks reports');
