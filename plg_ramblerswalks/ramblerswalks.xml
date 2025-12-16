@@ -8,8 +8,8 @@
 <extension type="plugin" group="console" method="upgrade">
 	<name>plg_system_ramblerswalks</name>
 	<description>Ramblers plugin to copy walks from WalksManager</description>
-	<version>1.0.9</version>
-	<creationDate>9 Jan 2025</creationDate>
+	<version>1.0.10</version>
+	<creationDate>15 Dec 2025</creationDate>
 	<author>Charlie Bigley</author>
     <authorEmail>webmaster@bigley.me.uk</authorEmail>
     <authorUrl>staffordshireramblers.org.uk</authorUrl>

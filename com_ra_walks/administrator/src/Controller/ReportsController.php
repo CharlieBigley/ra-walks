@@ -1,15 +1,16 @@
 <?php
 
 /**
- * @package     Ra_tools.Administrator
- * @subpackage  com_mywalks
- *
- * @copyright   Copyright (C) 2005 - 2019 Open Source Matters, Inc. All rights reserved.
+ * @version     1.1.1
+ * @package     com_ra_walks
+ * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @author      Charlie <webmaster@bigley.me.uk> - https://www.stokeandnewcastleramblers.org.uk
  * 02/06/23 CB JoomlaUsersByGroup - LEFT JOIN
  * 18/07/23 CB delete unused reports
  * 20/08/23 CB Show Admin'Site in menu report
  * 14/12/24 CB showLogfile added from backup
+ * 15/12/25 CB walks by month
  */
 
 namespace Ramblers\Component\Ra_walks\Administrator\Controller;
@@ -43,7 +44,7 @@ class ReportsController extends FormController {
         $this->toolsHelper = new ToolsHelper;
         $this->objApp = Factory::getApplication();
         $this->prefix = 'Reports: ';
-        $this->back = 'administrator/index.php?option=com_ra_tools&view=reports';
+        $this->back = 'administrator/index.php?option=com_ra_walks&view=reports';
         $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
         $wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
     }
@@ -279,7 +280,7 @@ class ReportsController extends FormController {
         $sql = "SELECT  date_format(walk_date,'%a %e-%m-%y') AS Date,";
         $sql .= "walks.title as 'Title', ";
         $sql .= "walks.contact_display_name as 'Leader', ";
-        $sql .= "walks.group_code as 'Group', ";
+        $sql .= "walks.organising_group as 'Group', ";
         $sql .= "walks.walk_id as WalkId, ";
         $sql .= "walks.id as 'Internal',";
 //        $sql .= "walks.leader_user_id, ";
@@ -414,6 +415,62 @@ class ReportsController extends FormController {
         $objTable->generate_table();
         echo $this->toolsHelper->backButton('administrator/index.php?option=com_ra_wf&task=reports.countUsers');
 //        echo "<p>";
+    }
+
+    public function showWalksByMonth() {  //index.php?option=com_ra_walks&task=reports.showWalksByMonth
+        $field = 'walk_date';
+        $table = ' #__ra_walks';
+        $criteria = '';
+//        $criteria = 'HAVING group_code="NS03" ';
+        $title = 'Walks by month';
+        $link = 'administrator/index.php?option=com_ra_walks&task=reports.showWalksForMonth';
+        //      $back = $this->back;
+        $back = 'administrator/index.php?option=com_ra_walks&view=reports';
+        echo $this->breadcrumbs;
+        $this->toolsHelper->showMonthMatrix($field, $table, $criteria, $title, $link, $back);
+    }
+
+    public function showWalksForDay() {
+        $date = $this->objApp->input->getCmd('date', '');
+        if ($date == '') {
+            ToolBarHelper::title('date is blank' . $date);
+            echo $this->toolsHelper->backButton($this->back);
+        }
+        ToolBarHelper::title('Walks for ' . $date);
+
+        $sql = "SELECT group_code, date_format(walk_date, '%a %e-%m-%y') as Date, ";
+        $sql .= "title,walk_leader, ";
+        //       $sql .= "ref, ";
+        $sql .= "distance_miles ";
+        $sql .= "FROM #__ra_walks ";
+        $sql .= "WHERE walk_date >='" . $date . " 00:00:00' ";
+        $sql .= "AND walk_date <'" . $date . " 23:59:59' ";
+        $sql .= "ORDER BY group_code, walk_date  ";
+//       echo $sql;
+        if ($this->toolsHelper->showSql($sql)) {
+            echo "<h5>End of walks for " . $date . "</h5>";
+        } else {
+            echo 'Error: ' . $this->toolsHelper->error . '<br>';
+        }
+
+        $back = 'administrator/index.php?option=com_ra_walks&task=reports.showWalksForMonth';
+        $yyyy = substr($date, 0, 4);
+        $mm = substr($date, 5, 2);
+        $back .= '&year=' . $yyyy . '&month=' . $mm;
+        echo $this->toolsHelper->backButton($back);
+    }
+
+    public function showWalksForMonth() {
+        //       echo $this->breadcrumbs . $this->breadcrumbsExtra('Walks by month', 'showWalksByMonth') . '<br>';
+        $yyyy = $this->objApp->input->getInt('year', '2025');
+        $mm = $this->objApp->input->getInt('month', '5');
+        $field = 'walk_date';
+        $table = ' #__ra_walks';
+        $criteria = '';
+        $title = 'Walks records for month ' . $mm . '/' . $yyyy;
+        $link = 'administrator/index.php?option=com_ra_walks&task=reports.showWalksForDay';
+        $back = 'administrator/index.php?option=com_ra_walks&task=reports.showWalksByMonth';
+        $this->toolsHelper->showDayMatrix($field, $table, $yyyy, $mm, $criteria, $title, $link, $back);
     }
 
     function walksAudit() {

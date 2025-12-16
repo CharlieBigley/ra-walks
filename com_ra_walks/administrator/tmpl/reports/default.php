@@ -1,6 +1,6 @@
 <?php
 /**
- * @version     1.0.7
+ * @version     1.1.1
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -12,17 +12,13 @@
  * 06/02/23 CB mailman report
  * 23/06/23 CB remove mailman reports again
  * 14/12/24 CB showLogfile
+ * 15/12/25 CB walks by month
  */
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Toolbar\Toolbar;
-use Joomla\CMS\Toolbar\ToolbarHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 
@@ -34,7 +30,6 @@ ToolBarHelper::title('Walks reports');
 // Import CSS
 $this->wa = $this->document->getWebAssetManager();
 $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
-;
 
 //echo __file__ . '<br>';
 //var_dump($this->params);
@@ -49,6 +44,11 @@ $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
         //$listDirn = $this->escape($this->state->get('list.direction'));
         $objTable->width = 30;
         $objTable->add_header('Report,Action', 'grey');
+
+        $objTable->add_item("Show Walks by Month");
+        $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showWalksByMonth", "Go", False, 'red'));
+        $objTable->add_item("");
+        $objTable->generate_line();
 
         $objTable->add_item("Show Logfile");
         $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_walks&task=reports.showLogfile", "Go", False, 'red'));
@@ -66,8 +66,6 @@ $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
             $objTable->add_item("");
             $objTable->generate_line();
 
-            // index.php?option=com_ra_tools&task=reports.showColours
-
             $objTable->add_item("Show Followers");
             $objTable->add_item($toolsHelper->buildButton("administrator/index.php?option=com_ra_wf&task=reports.showFollowers", "Go", False, 'red'));
             $objTable->generate_line();
@@ -82,5 +80,3 @@ $this->wa->registerAndUseStyle('ramblers', 'com_ra_tools/ramblers.css');
     </div>
 </div>
 </form>
-<?php
-echo "<!-- End of code from ' . __file . ' -->" . PHP_EOL;

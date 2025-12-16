@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+    <fields name="filter">
+        <field name="search" type="text" description="COM_RA_WALKS_SEARCH_FILTER_SUBMIT"
+               label="COM_USERS_FILTER_SEARCH_DESC"
+               class="js-stools-search-string" />
+
+        <field name="state"
+               type="status"
+               label="COM_RA_WALKS_FILTER_STATE"
+               description="COM_RA_WALKS_FILTER_STATE_DESC"
+               onchange="this.form.submit();"
+        >
+            <option value="">JOPTION_SELECT_PUBLISHED</option>
+        </field>
+
+         <field name="area_code" 
+            type="sql" 
+            label="Select Area" 
+            query="SELECT `code` AS `id`, name AS val FROM `#__ra_areas` ORDER BY name" 
+            header="Select Area" 
+            key_field="id" 
+            value_field="val" 
+            class="inputbox" 
+            onchange="this.form.submit()" 
+            translate="true"/>       
+
+    </fields>
+
+    <fields name="list">
+
+        <field name="fullordering"
+               type="list"
+               label="COM_RA_WALKS_LIST_FULL_ORDERING"
+               description="COM_RA_WALKS_LIST_FULL_ORDERING_DESC"
+               onchange="this.form.submit();"
+               default="a.id DESC"
+        >
+            <option value="">JGLOBAL_SORT_BY</option>
+            <option value="a.state ASC">Status Ascending</option>
+            <option value="a.state DESC">Status Descending</option>
+            <option value="a.walk_id ASC">Walk id Ascending</option>
+            <option value="a.walk_id DESC">Walk id Descending</option>
+            <option value="a.walk_date ASC">Walk date Ascending</option>
+            <option value="a.walk_date DESC">Walks date Descending</option>
+            <option value="a.group_code ASC">Group code Ascending</option>
+            <option value="a.group_code DESC">Group code Descending</option>
+            <option value="a.title ASC">Title Ascending</option>
+            <option value="a.title DESC">Title Descending</option>
+            <option value="a.contact_display_name ASC">Leader Ascending</option>
+            <option value="a.contact_display_name DESC">Leader Descending</option>
+            <option value="a.distance_miles ASC">Miles Ascending</option>
+            <option value="a.distance_miles DESC">Miles Descending</option>
+            <option value="a.start_time ASC">Start time Ascending</option>
+            <option value="a.start_time DESC">Start time Descending</option>
+            <option value="a.start_details ASC">Start details Ascending</option>
+            <option value="a.start_details DESC">Start details Descending</option>
+            <option value="a.difficulty ASC">Difficulty Ascending</option>
+            <option value="a.difficulty DESC">Difficulty Descending</option>
+            <option value="a.id ASC">id Ascending</option>
+            <option value="a.id DESC">id Descending</option>
+        </field>
+
+       <field name="limit"
+               type="limitbox"
+               label="COM_RA_WALKS_LIST_LIMIT"
+               description="COM_RA_WALKS_LIST_LIMIT_DESC"
+               class="input-mini"
+               default="25"
+               onchange="this.form.submit();"
+        />
+
+    </fields>
+
+</form>
