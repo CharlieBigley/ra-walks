@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="List Groups" option="View">
+	<layout title="List Groups (walks)" option="View">
 		<message>
 			<![CDATA[List Ramblers Groups - with walks]]>
 		</message>

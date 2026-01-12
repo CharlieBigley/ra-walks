@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="List Areas" option="View">
+	<layout title="List Areas (walks)" option="View">
 		<message>
 			<![CDATA[List Ramblers Areas  - with walks]]>
 		</message>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     1.1.1
+ * @version     1.1.2
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -26,6 +26,7 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHtml;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
+use Ramblers\Component\Ra_walks\Site\Helpers\WalksHelper;
 
 class ReportsController extends FormController {
 
@@ -83,6 +84,44 @@ class ReportsController extends FormController {
         $objTable->generate_table();
         echo $this->toolsHelper->backButton('administrator/index.php?option=com_ra_wf&view=reports');
 //        echo "<p>";
+    }
+
+    public function countValues($field = 'grade_local') {
+        echo '<h2>Spread of values for ' . $field . ' </h2>';
+        $this->countValuesYear('2026', $field);
+        $this->countValuesYear('2025', $field);
+        $this->countValuesYear('2024', $field);
+        $this->countValuesYear('2023', $field);
+        $this->countValuesYear('2022', $field);
+        $this->countValuesYear('2021', $field);
+    }
+
+    private function countValuesYear($yyyy, $field) {
+        // displays a table of values/counts for the given year/field
+
+        $sql = 'SELECT ' . $field . ' AS val, COUNT(id) AS cnt FROM #__ra_walks ';
+        $sql .= 'WHERE YEAR(walk_date)="' . $yyyy . '" ';
+        $sql .= 'GROUP BY ' . $field . ' ';
+        $sql .= 'ORDER BY ' . $field . ' ';
+        //       echo "$sql<br>";
+        //       return;
+        $rows = $this->toolsHelper->getRows($sql);
+        if (count($rows) > 0) {
+            echo '<h4>Year ' . $yyyy . '</h4>';
+            $objTable = new ToolsTable;
+            $objTable->add_header("Value,Count");
+            $total = 0;
+            foreach ($rows as $row) {
+                $objTable->add_item($row->val);
+                $objTable->add_item($row->cnt);
+                $objTable->generate_line();
+                $total += $row->cnt;
+            }
+            $objTable->add_item('Total');
+            $objTable->add_item($total);
+            $objTable->generate_line();
+            $objTable->generate_table();
+        }
     }
 
     private function setScopeCriteria() {
@@ -305,7 +344,7 @@ class ReportsController extends FormController {
         echo "<h2>Reporting</h2>";
         echo "<h4>Walk Leaders who are registered</h4>";
         $target = 'index.php?option=com_ra_wf&task=reports.showLeaders';
-        Helper::selectScope($this->scope, $target);
+        WalksHelper::selectScope($this->scope, $target);
         echo '<br>';
 
         $this->toolsHelper->showSql($sql);

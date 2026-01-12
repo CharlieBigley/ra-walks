@@ -1,6 +1,6 @@
 <?php
 /**
- * @version     1.1.1
+ * @version     1.1.2
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -13,12 +13,14 @@
  * 23/06/23 CB remove mailman reports again
  * 14/12/24 CB showLogfile
  * 15/12/25 CB walks by month
+ * 17/12/25 CB reinstate ToolbarHelper
  */
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Toolbar\ToolbarHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
 

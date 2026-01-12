@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @version    1.1.0
+ * @version    1.1.2
  * @component  com_ra_walks
  * @author     Charlie Bigley <webmaster@bigley.me.uk>
  * @copyright  2023 Charlie Bigley
@@ -30,7 +30,7 @@ $toolsHelper = new ToolsHelper;
 
 // See if RA Walks has been installed
 $com_ra_walks = ComponentHelper::isEnabled('com_ra_walks', true);
-$target_reports = 'index.php?option=com_ra_walks&view=reports_area&callback=area_list&area=';
+$target_reports = 'index.php?option=com_ra_walks&view=reports_area&invoked_by=area_list&area=';
 
 // get the current invokation parameters so that after drilldown, the
 // subordinate programs can return to the same state

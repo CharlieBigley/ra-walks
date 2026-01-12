@@ -1,17 +1,22 @@
 <?php
 
 /**
- * @version     4.0.12
+ * @version     1.1.2
  * @copyright   Copyright (C) 2021. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  * @author      Charlie <webmaster@bigley.me.uk> - https://www.stokeandnewcastleramblers.org.uk
  *
- *  This can be invoked from view list_area, in which case the Ares Code will be passed as a parameter
- *  or directly from a menu.
- *  In the second case, it takes the required Area Code from the component parameters
+ *  This program can be called in two ways:
+
+ *  1 From a superior menu
+ *  2 From a subordinate program, following it's invocation from here.
+ *
+ *  In the first case, this could be directly from a menu, or from list_areas
+ *  the parameters are stored in the user-state for later retrieval.
+ *  In the second case, the parameter "invoked_by" will be set to Y, and the
+ * required parameters are retrieved from the user-state.
  *
  * 15/05/21 CB created
- * // 22/06/21 correction for selection criteria for National reports
  * 21/07/21 tmpl=component
  * 24/09/22 CB allow three character for area (i.e NAT for national)
  * 23/05/23 CB converted to Joomla 4
@@ -36,12 +41,13 @@ use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
  */
 class HtmlView extends BaseHtmlView {
 
+    protected $app;
     protected $component_params;
     protected $menu_params;
 //  variables for the templates
     protected $area;
     protected $area_name;
-    protected $callback;
+    protected $back;
     protected $criteria_sql;
     protected $mode;
     protected $opt;
@@ -54,46 +60,71 @@ class HtmlView extends BaseHtmlView {
      */
     public function display($template = null) {
 //      Load the component params
-        $app = Factory::getApplication();
-        $this->component_params = $app->getParams();
+        $this->app = Factory::getApplication();
+        $this->component_params = $this->app->getParams();
         $context = 'com_ra_walks.reports.';
 
-        $this->scope = substr($app->input->getCmd('scope', 'F'), 0, 1);
-        // Report type will be blank, unless showing statistics
-        $this->report_type = substr($app->input->getWord('report_type', ''), 0, 1);
+        $this->scope = substr($this->app->input->getCmd('scope', 'F'), 0, 1);
+        // Invoked by will be blank if called from a menu or from group_list
+        $invoked_by = $this->app->input->getWord('invoked_by', '');
+        if ($invoked_by == '') {
+            $this->area = $this->getAreaCode();
+            $this->back = '';
+            $this->app->setUserState($context . 'callback.area', '');
+        } elseif ($invoked_by == 'area_list') {
+            // Area code will have been passed as input
+            $this->area = $this->app->input->getWord('area', 'NS');
+            $this->back = 'index.php?option=com_ra_walks&view=area_list';
+            $this->app->setUserState($context . 'callback.area', 'area_list');
+        } else {
+            // We are returning from a sub-ordinate program
+            // Retrieve parameters from the user state
+            $this->area = $this->app->getUserState($context . 'area');
+            $back = $this->app->getUserState($context . 'callback.area');
+            $this->back = 'index.php?option=com_ra_walks&view=' . $back;
+        }
+        if (JDEBUG) {
+            echo "View: reports_area<br>";
+            echo "invoked_by: $invoked_by<br>";
+            echo "area: $this->area<br>";
+            echo "scope: $this->scope<br>";
+        }
 
-        // Callback will be blank if called from a menu
-        $this->callback = $app->input->getWord('callback', '');
+        $this->app->setUserState($context . 'area', $this->area);
+        $this->app->setUserState($context . 'scope', $this->scope);
+        // Report type will be blank, unless showing statistics
+
+        $this->app->setUserState($context . 'mode', 'A');
+        $this->app->setUserState($context . 'opt', $this->area);
+
 
 //      See if we have been invoked from a menu
         // If invoked from list_areas, the specific area_code will have been passed as parameter
-        // However, if invoked from a menu, assume it is a Group or Area website,
-        // and derive the code from the menu parameters
-        $this->area = $app->input->getWord('area', '');
-        if ($this->area == '') {
-            $menu = $app->getMenu()->getActive();
-            if (is_null($menu)) {
-                echo "Menu is Null, defaulting to National walks<br>";
-                $this->area = 'NAT';
-            } else {
-                $this->menu_params = $menu->getParams();
-                $type = $this->menu_params->get('type');
-                if ($type == 'national') {
-                    $this->area = 'NAT';
-                } else {
-                    if ($type == 'home') {
-                        $tools_params = $app->getParams('com_ra_tools');
-                        $this->area = substr($tools_params->get('default_group'), 0, 2);
-                    } else {
-                        $this->area = $this->menu_params->get('area', 'NAT');
-                    }
-                }
-
-                $app->setUserState($context . 'mode', 'A');
-                $app->setUserState($context . 'opt', $this->area);
-//               echo "Menu is active, area=$this->area<br>";
-            }
-        }
+//        // However, if invoked from a menu, assume it is a Group or Area website,
+//        // and derive the code from the menu parameters
+//        $this->area = $app->input->getWord('area', '');
+//        if ($this->area == '') {
+//            $menu = $app->getMenu()->getActive();
+//            if (is_null($menu)) {
+//                echo "Menu is Null, defaulting to National walks<br>";
+//                $this->area = 'NAT';
+//            } else {
+//                $this->menu_params = $menu->getParams();
+//                $type = $this->menu_params->get('type');
+//                if ($type == 'national') {
+//                    $this->area = 'NAT';
+//                } else {
+//                    if ($type == 'home') {
+//                        $tools_params = $app->getParams('com_ra_tools');
+//                        $this->area = substr($tools_params->get('default_group'), 0, 2);
+//                    } else {
+//                        $this->area = $this->menu_params->get('area', 'NAT');
+//                    }
+//                }
+//                $app->setUserState($context . 'mode', 'A');
+//                $app->setUserState($context . 'opt', $this->area);
+//            }
+//        }
 
 
         if ($this->scope == 'A') {
@@ -111,19 +142,59 @@ class HtmlView extends BaseHtmlView {
                 $this->criteria_sql .= ' NOT (walks.state=1)  ';
             }
         }
-        $app->setUserState($context . 'scope', $this->scope);
+        $this->app->setUserState($context . 'scope', $this->scope);
         // Load the template header here to simplify the template
         $this->prepareDocument();
 
         // get the current invokation parameters so that after drilldown, the
         // subordinate programs can return to the same state
-        $app->setUserState('com_ra_walks.callback_matrix', 'reports_area');
-
-//      set callback in globals so TopWalkLeaders can return as appropriate
-        $app->setUserState('com_ra_walks.reports.topleaders', 'reports_area');
+        $this->app->setUserState('com_ra_walks.callback_matrix', 'reports_area');
 
         // N.B. name of template has been over-ridden in the construct above
         parent::display($template);
+    }
+
+    protected function buildTarget($row, $col) {
+        // builds the parameters from the chosen option for the drilldown report
+        $target = 'index.php?option=com_ra_walks&view=reports_matrix';
+        $target .= '&invoked_by=reports_area';
+        $target .= '&opt=' . $this->area . '&mode=A';
+        $target .= '&scope=' . $this->scope;
+        $target .= '&row=' . $row . '&col=' . $col;
+        //       echo "$target<br>";
+        return $target;
+    }
+
+    private function getAreaCode() {
+        // See if invoked from area_list
+        $this->area = $this->app->input->getWord('area', '');
+        $this->report_type = substr($this->app->input->getWord('report_type', ''), 0, 1);
+        // However, if invoked from a menu, assume it is a Group or Area website,
+        // and derive the code from the menu parameters
+        if ($this->area == '') {
+            $menu = $this->app->getMenu()->getActive();
+            if (is_null($menu)) {
+                echo "Menu is Null, defaulting to National walks<br>";
+                $this->area = 'NAT';
+            } else {
+                $this->menu_params = $menu->getParams();
+                $type = $this->menu_params->get('type');
+                if ($type == 'national') {
+                    $this->area = 'NAT';
+                } else {
+                    if ($type == 'home') {
+                        $tools_params = $this->app->getParams('com_ra_tools');
+                        $this->area = substr($tools_params->get('default_group'), 0, 2);
+                    } else {
+                        $this->area = $this->menu_params->get('area', 'NAT');
+                    }
+                }
+            }
+            if (JDEBUG) {
+                echo "getAreaCode: $this->area<br>";
+            }
+        }
+        return $this->area;
     }
 
     /**
@@ -175,15 +246,6 @@ class HtmlView extends BaseHtmlView {
         if ($this->component_params->get('robots')) {
             $this->document->setMetadata('robots', $this->component_params->get('robots'));
         }
-    }
-
-    protected function buildTarget($row, $col) {
-        // builds the parameters from the chosen option for the drilldown report
-        $target = 'index.php?option=com_ra_walks&task=reports.drilldown';
-        // $targer .= '&tmpl=component';
-        $target .= '&scope=' . $this->scope;
-        $target .= '&row=' . $row . '&col=' . $col;
-        return $target;
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     0.1.2
+ * @version     1.1.2
  * @package     com_ra_walks(Ramblers Walks)
  * @copyright   Copyright (C) 2021. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -16,11 +16,12 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Ramblers\Component\Ra_walks\Site\Helpers\WalksHelper;
 
 echo "<!-- Code from com_ra_walks/views/reports_area/tmpl/reports_area.php -->" . PHP_EOL;
 echo "Start of code from " . __FILE__ . '<br>';
 $toolsHelper = new ToolsHelper;
-
+$walksHelper = new WalksHelper;
 $title = $this->component_params->get('page_title', '');
 ?>
 <script type="text/javascript">
@@ -48,7 +49,7 @@ if ($this->area == 'NAT') {
 }
 
 $target = "index.php?option=com_ra_walks&view=reports_area&area=" . $this->area;
-$toolsHelper->selectScope($this->scope, $target);
+$walksHelper->selectScope($this->scope, $target);
 echo '<p>Total number of walks in scope=<b>' . number_format($toolsHelper->getValue($sql)) . '</b><i>';
 if ($this->scope == "F") {              // Future walks
     echo ' (this includes all walks on or after today, that have not been cancelled in WM)';
@@ -125,7 +126,6 @@ $objTable->generate_table();
 echo '<h4>Other analyses</h4>';
 
 $self = 'index.php?option=com_ra_walks&view=reports_area&area=' . $this->area . '&scope=' . $this->scope;
-$callback = ToolsHelper::convert_to_ASCII($self);
 
 $target = $this->buildTarget('Y', 'YM') . '&callback=' . $callback;
 echo 'Year/Month ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
@@ -148,7 +148,7 @@ if ($this->area == 'NAT') {
 
     echo 'Top Groups for walks ' . $toolsHelper->imageButton('I', $target . 'showTopGroups', false, "link-button button-p5565") . '<br>';
 
-    echo 'Guest walks' . $toolsHelper->imageButton('I', $target . 'guestWalks', false, "link-button button-p5565") . '<br>';
+//    echo 'Guest walks' . $toolsHelper->imageButton('I', $target . 'guestWalks', false, "link-button button-p5565") . '<br>';
 
     echo 'Feed summary' . $toolsHelper->imageButton('I', $target . 'showFeedSummary', false, "link-button button-p5565") . '<br>';
 } else {

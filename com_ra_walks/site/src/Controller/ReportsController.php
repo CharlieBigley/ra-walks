@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     4.0.0
+ * @version     1.1.2
  * @package     com_ra_walks (Ramblers Walks Follow)
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -9,6 +9,7 @@
  * 04/12/2 CB created from com ramblers
  * 08/12/22 CB use Ra_wfWalk
  * 24/04/25 CB showWalksByDate
+ * 10/01/26 use WalksHelper
  */
 
 namespace Ramblers\Component\Ra_walks\Site\Controller;
@@ -23,6 +24,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
+use Ramblers\Component\Ra_walks\Site\Helpers\WalksHelper;
 
 /**
  * Ramblers list controller
@@ -92,28 +94,41 @@ class ReportsController extends FormController {
     }
 
     function countWalks() {
-        $code = $this->objApp->input->getCmd('code', 'NAT');
-        $callback = $this->objApp->input->getCmd('callback', 'view=walks');
-        echo "<h2>Total walks by Group";
+        $code = $this->objApp->input->getCmd('opt', 'NAT');
+        $this->scope = $this->objApp->input->getCmd('scope', 'A');
+        $back = $this->getInvokedBy();
+
+        $objTable = new ToolsTable();
+
+        $objTable->add_header("Code,Group, Count");
+        $name = $this->db->quoteName('groups') . '.' . $this->db->quoteName('name');
+        $this->query = $this->db->getQuery(true);
+        $this->query->select("group_code, COUNT(w.id) as 'Num'");
+        $this->query->select($name);
+        $this->query->from($this->db->quoteName('#__ra_walks', 'w'));     // Second parameter generates AS clause
+        $this->query->innerJoin($this->db->quoteName('#__ra_groups', 'groups') . ' ON ' . $this->db->quoteName('w.group_code') . '=' . $this->db->quoteName('groups.code'));
+
+        $this->setScopeCriteria();
+        if (strlen($code) == 2) {
+            $this->query->where(' (group_code like "' . $code . '%") ');
+        }
+        $this->query->group('group_code');
+        $this->query->order('group_code');
+        if (JDEBUG) {
+            echo (string) $this->query . '<br>';
+        }
+        echo '<h2>' . $this->scope_description . ' by Group';
         if (strlen($code) == 2) {
             echo ' for ' . $this->toolsHelper->lookupArea($code);
         }
         echo "</h2>";
-        $objTable = new ToolsTable();
 
-        $objTable->add_header("Group, Count");
-        $sql = "SELECT  group_code, COUNT(id) as 'Num' ";
-        $sql .= 'FROM #__ra_walks ';
-        if (strlen($code) == 2) {
-            $sql .= 'WHERE (group_code like "' . $code . '%") ';
-        }
-        $sql .= 'GROUP BY group_code ';
-        $sql .= 'ORDER BY group_code ';
-//        echo $sql;
-        $rows = $this->toolsHelper->getRows($sql);
+        $this->db->setQuery($this->query);
+        $rows = $this->db->loadObjectList();
         $total_walks = 0;
         foreach ($rows as $row) {
             $objTable->add_item($row->group_code);
+            $objTable->add_item($row->name);
             $objTable->add_item($row->Num);
             $total_walks += $row->Num;
             $objTable->generate_line();
@@ -121,13 +136,6 @@ class ReportsController extends FormController {
         $objTable->generate_table();
         echo number_format($total_walks) . ' Walks<br>';
         // Depending on from where it was invoked, control will be passed back either to reports or to reports_area
-
-        $back = 'index.php?option=com_ra_walks&view=';
-        if ($callback == '') {
-            $back .= 'walks';
-        } else {
-            $back .= $callback . '&area=' . $code;
-        }
         echo $this->toolsHelper->backButton($back);
     }
 
@@ -366,12 +374,8 @@ class ReportsController extends FormController {
     }
 
     public function guestWalks() {
-        if ($callback == '') {
-            $target = "index.php?option=com_ra_walks&view=reports_area&area=NAT";
-        } else {
-            $target = $this->toolsHelper::convert_from_ASCII($callback);
-        }
-        echo $this->toolsHelper->backButton($target);
+        // 25/12/25 Was invoked from reports_area, bit commented out
+        echo $this->toolsHelper->backButton($this->getInvokedBy());
     }
 
     public function extractAreas() {
@@ -397,9 +401,27 @@ ORDER BY nations.name, areas.name";
         echo $this->toolsHelper->backButton($back);
     }
 
+    private function getInvokedBy() {
+        $back = 'index.php?option=com_ra_walks&invoked_by=reports&view=';
+        $context = 'com_ra_walks.reports.';
+        $invoked_by = $this->app->input->getWord('invoked_by', '');
+        if ($invoked_by == '') {
+            // returning from a subordinate program
+            // retrieve value from the user state
+            $invoked_by = $this->app->getUserState($context . 'callback.reports');
+            $this->opt = $this->app->getUserState($context . 'opt');
+        } else {
+            // save for later use
+            $this->app->setUserState($context . 'callback.reports', $invoked_by);
+            $this->opt = $this->app->input->getCmd('opt', '');
+            $this->app->setUserState($context . 'opt', $this->opt);
+        }
+        return $back . $invoked_by;
+    }
+
     public function groupsNoWalks() {
         $area = $this->objApp->input->getCmd('area', '');
-        $callback = $this->objApp->input->getCmd('callback', '');
+        $back = $this->getInvokedBy();
 
         echo "<h4>Groups without future walks in WM";
         $this->scope = 'F';  // Only interested in Future walks
@@ -447,14 +469,7 @@ ORDER BY nations.name, areas.name";
         }
         echo $objTable->num_rows - 1 . ' Groups ';
 
-        // This can be called from Report/ Report_group or reports_area
-        // return as appropriate
-        if ($callback == '') {
-            $target = "index.php?option=com_ra_walks&view=reports";
-        } else {
-            $target = $this->toolsHelper::convert_from_ASCII($callback);
-        }
-        echo $this->toolsHelper->backButton($target);
+        echo $this->toolsHelper->backButton($back);
     }
 
     private function prependZero($value) {
@@ -510,17 +525,21 @@ ORDER BY nations.name, areas.name";
     }
 
     private function setScopeCriteria() {
+        $this->scope_description = 'All walks';
         switch ($this->scope) {
             case ($this->scope == 'D');
-                $this->query->where('state<>1');
+                $this->query->where('w.state<>1');
+                $this->scope_description = 'Cancelled';
                 break;
             case ($this->scope == 'F');
-                $this->query->where('state=1');
+                $this->query->where('w.state=1');
                 $this->query->where('datediff(walk_date, CURRENT_DATE) >= 0');
+                $this->scope_description = 'Future walks';
                 break;
             case ($this->scope == 'H');
-                $this->query->where('state=1');
+                $this->query->where('w.state=1');
                 $this->query->where('datediff(walk_date, CURRENT_DATE) < 0');
+                $this->scope_description = 'Past walks';
         }
     }
 
@@ -981,7 +1000,7 @@ ORDER BY nations.name, areas.name";
         echo "<h2>Reporting</h2>";
         echo "<h4>Walk Leaders who are registered</h4>";
         $target = 'index.php?option=com_ra_walks&task=reports.showRegisteredLeaders';
-        ToolsHelper::selectScope($this->scope, $target);
+        WalksHelper::selectScope($this->scope, $target);
         echo '<br>';
 
         $this->toolsHelper->showQuery($sql);
@@ -1093,10 +1112,10 @@ ORDER BY nations.name, areas.name";
         echo '</select> ';
 
         $target = '/index.php?option=com_ra_walks&task=reports.showTopAreas&scope=' . $this->scope . '&limit=' . $limit;
-        ToolsHelper::selectLimit($limit, $target);
+        WalksHelper::selectLimit($limit, $target);
 
         $target = 'index.php?option=com_ra_walks&task=reports.showTopAreas&limit=' . $limit . '&sort=' . $sort;
-        ToolsHelper::selectScope($this->scope, $target);
+        WalksHelper::selectScope($this->scope, $target);
         echo '<br>';
         $this->query = $this->db->getQuery(true);
         $this->query->select('areas.code');
@@ -1165,8 +1184,8 @@ ORDER BY nations.name, areas.name";
             $target = $self . "&csv=TopAreas";
             echo $this->toolsHelper->buildLink($target, "Extract as CSV", false, "link-button button-p0159");
         }
-        $target = 'index.php?option=com_ra_walks&view=reports_area&area=NAT&scope=' . $this->scope;
-        echo $this->toolsHelper->backButton($target);
+        $back = $this->getInvokedBy();
+        echo $this->toolsHelper->backButton($back);
         //echo '<a href="#top">Top</a>';
         echo $this->toolsHelper->anchor();
     }
@@ -1220,10 +1239,10 @@ ORDER BY nations.name, areas.name";
         }
         echo '</select> ';
         $target = $self . '&scope=' . $this->scope . '&limit=' . $limit;
-        ToolsHelper::selectLimit($limit, $target);
+        WalksHelper::selectLimit($limit, $target);
 
         $target = $self . '&limit=' . $limit . '&sort=' . $sort;
-        ToolsHelper::selectScope($this->scope, $target);
+        WalksHelper::selectScope($this->scope, $target);
         echo '<br>';
         $this->query = $this->db->getQuery(true);
         $this->query->select('groups.code');
@@ -1289,15 +1308,16 @@ ORDER BY nations.name, areas.name";
         $this->scope = $this->objApp->input->getWord('scope', 'F');
         $limit = $this->objApp->input->getInt('limit', '20');
         $mode = $this->objApp->input->getWord('mode', 'A');
-        $opt = $this->objApp->input->getWord('opt', 'NAT');
+        $opt = $this->objApp->input->getCmd('opt', 'NAT');
         $sort = $this->objApp->input->getWord('sort', 'M');
-        $scallback = $this->objApp->input->getWord('callback', '');
-//        $self = 'index.php?option=com_ra_walks&task=reports.showTopLeaders';
-
-        $current_uri = Uri::getInstance()->toString();
-        echo $current_uri . '<br>';
-//      set callback in globals so $drilldown_walks can return as appropriate
-        Factory::getApplication()->setUserState('com_ra_walks.callback_matrix', $current_uri);
+        $back = $this->getInvokedBy();
+        if (JDEBUG) {
+            $current_uri = Uri::getInstance()->toString();
+            echo $current_uri . '<br>';
+            echo "mode: $mode<br>";
+            echo "opt: $opt<br>";
+            echo "scope: $this->scope<br>";
+        }
         ?>
 
         <script type="text/javascript">
@@ -1341,6 +1361,8 @@ ORDER BY nations.name, areas.name";
         $this->setSelectionCriteria($mode, $opt);
         $this->db->setQuery($this->query);
         $count = $this->db->loadResult();
+        echo '<h2>Group=' . $this->opt . ' ' . $this->toolsHelper->lookupGroup($this->opt);
+        echo ', ' . $this->scope_description . '</h2>';
         echo 'Total number of Leaders: ';
         if ($this->toolsHelper->isSuperuser()) {
             $target = 'index.php?option=com_ra_walks&task=reports.showLeaders&mode=' . $mode . '&opt=' . $opt . '&scope=' . $this->scope;
@@ -1383,22 +1405,7 @@ ORDER BY nations.name, areas.name";
         if ($count > 0) {
             echo ', Single name: ' . number_format($count) . ', ' . round($count * 100 / $total) . '%<br>';
         }
-        echo "<h2>Top $limit Walk leaders, ";
-        $back = "index.php?option=com_ra_walks&view=";
-        if ($mode == 'G') {
-            echo 'Group=' . $opt . ' ' . $this->toolsHelper->lookupGroup($opt);
-            $back .= "reports_group&group_code=$opt";
-        } else {
-            if ($opt == 'NAT') {
-                echo 'National';
-                $back .= "reports_area&area=NAT";
-            } else {
-                echo 'Area=' . $opt . ' ' . $this->toolsHelper->lookupArea($opt);
-                $back .= "reports_area&area=$opt";
-            }
-        }
-        $back .= "&scope=" . $this->scope;
-        echo '</h2>';
+        echo "<h4>Top $limit Walk leaders</h4>";
         $options[] = 'Sort by average distance';
         $options_value[] = 'A';
         $options[] = 'Sort by number of walks';
@@ -1421,12 +1428,12 @@ ORDER BY nations.name, areas.name";
         $target = "/index.php?option=com_ra_walks&task=reports.showTopLeaders";
         $target .= "&mode=$mode&opt=$opt";
         $target .= "&sort=$sort&scope=" . $this->scope;
-        ToolsHelper::selectLimit($limit, $target);
+        WalksHelper::selectLimit($limit, $target);
 
         $target = "/index.php?option=com_ra_walks&task=reports.showTopLeaders";
         $target .= "&mode=$mode&opt=$opt";
         $target .= "&sort=$sort&limit$limit";
-        ToolsHelper::selectScope($this->scope, $target);
+        WalksHelper::selectScope($this->scope, $target);
 //        echo '<br>';
 
         $this->query = $this->db->getQuery(true);
@@ -1485,12 +1492,6 @@ ORDER BY nations.name, areas.name";
             $code = $e->getCode();
             Factory::getApplication()->enqueueMessage($code . ' ' . $e->getMessage(), 'error');
             Factory::getApplication()->enqueueMessage('sql=' . (string) $this->query, 'message');
-        }
-        $callback = $this->objApp->GetUserState('com_ra_walks.reports.topleaders');
-        if ($callback == 'reports_group') {
-            $back = 'index.php?option=com_ra_walks&view=' . $callback . '&group_code=' . $opt;
-        } else {
-            $back = 'index.php?option=com_ra_walks&view=' . $callback . '&area=' . $opt;
         }
         echo $this->toolsHelper->backButton($back);
     }
@@ -1673,7 +1674,7 @@ ORDER BY nations.name, areas.name";
         echo "<h2>Reporting</h2>";
         echo "<h4>Walks and Followers</h4>";
         $target = 'index.php?option=com_ra_walks&task=reports.walksFollowers';
-        ToolsHelper::selectScope($this->scope, $target);
+        WalksHelper::selectScope($this->scope, $target);
         echo '<br>';
 //        echo $sql;
         $this->toolsHelper->showQuery($sql);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     4.0.12
+ * @version     1.1.2
  * @package     com_ra_walks(Ramblers Walks)
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -58,8 +58,6 @@ class HtmlView extends BaseHtmlView {
             $this->menu_params = $menu->getParams();
         }
 
-//      set callback in globals so walk_detail, showFollowers and feedback can return as appropriate
-        Factory::getApplication()->setUserState('com_ra_walks.callback', 'reports');
         // Find from which menu we have been invoked
         $menu_id = $app->input->getInt('Itemid', '0');
         Factory::getApplication()->setUserState('com_ra_walks.menu_id', $menu_id);

@@ -1,12 +1,13 @@
 <?php
 
 /**
- * @version     0.1.2
+ * @version     1.1.3
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2021. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  * @author      Charlie <webmaster@bigley.me.uk> - https://www.stokeandnewcastleramblers.org.uk
  * This is a generic program to display a report matrix about Walks held in the local database.
+ *
  *
  * Many combinations of row / column can be specified, but in each case the appropriate size
  * is calculated dynamically.
@@ -21,6 +22,7 @@
  * 19/06/21 select scope
  * 21/06/21 Show national walks
  * 18/07/21 Don't use drilldown icon
+ * 10/01/26 If column weekday, sort by DAYOFWEEK, use WalksHelper
  */
 // No direct access
 defined('_JEXEC') or die;
@@ -28,6 +30,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
+use Ramblers\Component\Ra_walks\Site\Helpers\WalksHelper;
 
 $toolsHelper = new ToolsHelper;
 
@@ -43,9 +46,11 @@ echo "<h2>Matrix for  $this->row_type / $this->col_type</h2>";
 <?php
 
 echo '<h4>' . $this->criteria . ', ';
-$target = 'index.php?option=com_ra_walks&task=reports.drilldown';
-
-ToolsHelper::selectScope($this->scope, $target);
+$target = 'index.php?option=com_ra_walks&view=reports_matrix&mode=' . $this->mode;
+$target .= '&opt=' . $this->opt . '&report_type=' . $this->report_type;
+$target .= '&row=' . $this->row . '&col=' . $this->col;
+// append the scope parameter
+WalksHelper::selectScope($this->scope, $target);
 echo '</h4>';
 $debug = 0; // set to 1 or 2 as required to debug
 
@@ -60,10 +65,16 @@ if (($this->mode == 'G') OR ($this->col == 'G') OR ($this->col == 'A')) {
 $col_group_by = "GROUP BY " . $this->col_field;
 if ($this->col == 'W') {
     $col_group_by .= ", WEEKDAY(walk_date) ";
+    $col_group_by .= ', DAYOFWEEK(walk_date) ';
+    $col_group_by .= "ORDER BY DAYOFWEEK(walk_date)";
+} else {
+    $col_group_by .= "ORDER BY " . $this->col_field;
 }
-$col_group_by .= " ORDER BY " . $this->col_field;
 
 $row_sql = 'SELECT ' . $this->row_field . ' AS  `row_type`, ' . $this->col_field . ' AS  `col_type`, count(*) AS `record_count` ';
+if ($this->row == 'W') {
+    $row_sql .= ', DAYOFWEEK(walk_date) ';
+}
 $row_sql .= "from #__ra_walks as walks  ";
 if (($this->mode == 'G') OR ($this->row == 'G') OR ($this->row == 'A') OR ($this->col == 'G')) {
     $row_sql .= "INNER JOIN #__ra_groups AS `groups` ON walks.group_code = `groups`.code ";
@@ -72,7 +83,12 @@ if (($this->mode == 'G') OR ($this->row == 'G') OR ($this->row == 'A') OR ($this
     }
 }
 $row_group_by = "GROUP BY " . $this->row_field . ", " . $this->col_field . " ";
-$row_group_by .= "ORDER BY " . $this->row_field;
+if ($this->row == 'W') {
+    $row_group_by .= ', DAYOFWEEK(walk_date) ';
+    $row_group_by .= "ORDER BY DAYOFWEEK(walk_date)";
+} else {
+    $row_group_by .= "ORDER BY " . $this->row_field;
+}
 
 if (!$this->criteria_sql == '') {
     $row_sql .= 'WHERE ' . $this->criteria_sql;
@@ -88,8 +104,8 @@ if ($debug) {
     echo 'Where ' . $this->criteria_sql . ', Group by=' . $row_group_by . '<br>';
     echo $row_sql . '<br>';
 }
-$target = 'index.php?option=com_ra_walks&task=reports.drilldownList';
-//$target .= $this->mode . '&opt=' . $this->opt . '&scope=' . $this->scope;
+$target = 'index.php?option=com_ra_walks&view=reports_matrix&report_type=L&invoked_by=self';
+$target .= '&scope=' . $this->scope;
 $objTable = new ToolsTable;
 $objTable->add_column($this->row_type, "L");
 $col_count = 1;    // first header description will go in Column 1
@@ -144,7 +160,9 @@ try {
  *
  */
 $curr_row_type = '';
-echo "$row_sql<br>";
+if (JDEBUG) {
+    echo "$row_sql<br>";
+}
 try {
     $query = $db->getQuery(true);
 // Execute the main query to find the rows of the table
@@ -258,12 +276,6 @@ if ($objTable->num_columns > 4) {
     echo ($objTable->num_columns - 2) . ' different values of <i>' . $this->col_type . '</i>';
 }
 echo '<br>';
-$back = "index.php?option=com_ra_walks&view=";
-if ($this->mode == 'A') {
-    $back .= 'reports_area&area=';
-} else {
-    $back .= 'reports_group&group_code=';
-}
-$back .= $this->opt;
-echo $toolsHelper->backButton($back);
+
+echo $toolsHelper->backButton($this->back . $this->scope);
 

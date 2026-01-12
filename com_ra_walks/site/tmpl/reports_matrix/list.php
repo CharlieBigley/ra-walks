@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     1.1.0
+ * @version     1.1.3
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -9,7 +9,7 @@
  * Usually this is invoked from view reports_matrix (template reports_matrix.php), and therefore that is the target of the "Back" button.
 
   However, it can also be invoked from other reports, for example reports_statistics.php.
- * In such cases, the parameters being passed will include "callback",
+ * In such cases, the parameters being passed will include "invoked_by",
  * so $this->callback will contain the appropriate URL.
  * 13/05/21 created
  * 10/06/21 Different code if invoked from showTopDistance
@@ -29,16 +29,14 @@ $toolsHelper = new ToolsHelper;
 $objApp = JFactory::getApplication();
 echo "<h2>Walks Drilldown detail" . "</h2>";
 echo "<h4>Scope=" . $this->scope_desc . ', ' . $this->criteria;
-if ($this->row != '') {
-    echo ', ' . $this->row_type . "=";
-//    if (($this->row == 'M') AND ($this->col == '')) {
-    echo $this->row_value;
-//    } else {
-//        echo $this->row_value;
-//    }
-}
-if (!$this->col == '') {
-    echo ', ' . $this->col_type . "=" . $this->col_value;
+if (JDEBUG) {
+    if ($this->row != '') {
+        echo ', ' . $this->row_type . "=";
+        echo $this->row_value;
+    }
+    if (!$this->col == '') {
+        echo ', ' . $this->col_type . "=" . $this->col_value;
+    }
 }
 echo '</h4>';
 $db = JFactory::getDbo();
@@ -50,9 +48,8 @@ $query->select($db->quoteName('start_time'));
 $query->select($db->quoteName('walks.title'));
 $query->select($db->quoteName('group_code'));
 $query->select($db->quoteName('difficulty'));
-$query->select($db->quoteName('grade_local'));
 $query->select($db->quoteName('distance_miles'));
-$query->select($db->quoteName('pace'));
+$query->select($db->quoteName('ascent_feet'));
 $query->select($db->quoteName('contact_display_name'));
 $query->select($db->quoteName('walks.state'));
 $query->select($db->quoteName('walks.id'));
@@ -87,7 +84,7 @@ try {
     $rows = $db->loadObjectList();
     $target_info = "index.php?option=com_ra_walks&view=walk&id=";
     $objTable = new ToolsTable;
-    $objTable->add_header("Date,Meet/Start,Title,Group,Diff,Grade,Miles,Pace,Leader");
+    $objTable->add_header("Date,Meet/Start,Title,Group,Diff,Miles,Ascent,Leader");
     foreach ($rows as $row) {
 
         $objTable->add_item($row->Date);
@@ -106,9 +103,8 @@ try {
 //        $objTable->add_item($row->title);
         $objTable->add_item($row->group_code);
         $objTable->add_item($row->difficulty);
-        $objTable->add_item($row->grade_local);
         $objTable->add_item($row->distance_miles);
-        $objTable->add_item($row->pace);
+        $objTable->add_item($row->ascent_feet);
         $objTable->add_item($row->contact_display_name);
         if ($row->state == 0) {   // walk is draft
             $line_colour = "#ffffaa";
@@ -129,12 +125,5 @@ try {
     JFactory::getApplication()->enqueueMessage($code . ' ' . $e->getMessage(), 'error');
     JFactory::getApplication()->enqueueMessage($db->replacePrefix($query));
 }
-if (!$this->callback == '') {
-    $back = 'index.php?option=com_ra_walks&view=' . $this->callback;
-} else {
-    // All the required parameters will have been saved in the user state
-    $back = 'index.php?option=com_ra_walks&view=reports_matrix';
-}
-
-echo $toolsHelper->backButton($back);
+echo $toolsHelper->backButton($this->back . $this->scope);
 ?>

@@ -1,12 +1,13 @@
 <?php
 
 /*
- * @version    1.1.0
+ * @version    1.1.2
  * @component  com_ra_walks
  * @author     Charlie Bigley <webmaster@bigley.me.uk>
  * @copyright  2023 Charlie Bigley
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  * 19/02/25 CB copied from com_ra_tools
+ * 17/12/25 CB reinstate URI
  */
 
 namespace Ramblers\Component\Ra_walks\Site\Controller;
@@ -17,7 +18,7 @@ use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\FormController;
 //use Joomla\CMS\Router\Route;
-//use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Utilities\ArrayHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;

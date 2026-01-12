@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     1.1.0
+ * @version     1.1.2
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt

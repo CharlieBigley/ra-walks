@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     0.1.2
+ * @version     1.1.2
  * @package     com_ra_walks(Ramblers Walks)
  * @copyright   Copyright (C) 2021. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -18,12 +18,12 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsHelper;
 use Ramblers\Component\Ra_tools\Site\Helpers\ToolsTable;
+use Ramblers\Component\Ra_walks\Site\Helpers\WalksHelper;
 
 $toolsHelper = new ToolsHelper;
 $title = $this->component_params->get('page_title', '');
 
 $group_name = $toolsHelper->getValue("SELECT name FROM #__ra_groups where code='" . $this->group_code . "' ");
-echo "<h2>" . 'Group=' . $this->group_code . ' ' . $group_name . "</h2>";
 ?>
 <script type="text/javascript">
     function changeScope(target) {
@@ -33,9 +33,10 @@ echo "<h2>" . 'Group=' . $this->group_code . ' ' . $group_name . "</h2>";
 </script>
 <?php
 
-$target = "index.php?option=com_ra_walks&view=reports_group&group_code=" . $this->group_code;
-ToolsHelper::selectScope($this->scope, $target);
-echo '<br>';
+$target = "index.php?option=com_ra_walks&view=reports_group&opt=" . $this->group_code;
+$target .= '&invoked_by=refresh';
+walksHelper::selectScope($this->scope, $target);
+
 $sql = "SELECT COUNT(id) FROM #__ra_walks ";
 $sql .= "WHERE group_code ='" . $this->group_code . "' ";
 
@@ -52,7 +53,8 @@ if ($this->scope == "F") {              // Future walks
 } else {
     $scope_desc = 'All walks';
 }
-//echo $sql . '<br>';
+echo '<h2>Group=' . $this->group_code . ' ' . $group_name;
+echo ', ' . $scope_desc . '</h2>';
 
 echo '<p>Total number of walks in scope=<b>' . $toolsHelper->getValue($sql) . '</b><i>';
 if ($this->scope == "F") {              // Future walks
@@ -74,50 +76,31 @@ $objTable = new ToolsTable;
 $objTable->add_column('Row', 'L');
 $objTable->add_column('Difficulty', 'C');
 $objTable->add_column('DOW', 'C');
-$objTable->add_column('Grade', 'C');
-$objTable->add_column('Pace', 'C');
+$objTable->add_column('Miles', 'C');
 $objTable->generate_header();
 
-/*
-  $objTable->add_item('Group');
-  $target = $this->buildTarget('G', 'Dif');
-  $objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-  $target = $this->buildTarget('G', 'W');
-  $objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-  $target = $this->buildTarget('G', 'L');
-  $objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-  $target = $this->buildTarget('G', 'P');
-  $objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-  $objTable->generate_line('');
- */
+$objTable->add_item('Diff');
+$objTable->add_item('');
+$target = $this->buildTarget('Dif', 'W');
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$target = $this->buildTarget('Dif', 'MR');
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->generate_line('');
+
+$objTable->add_item('DOW');
+$target = $this->buildTarget('W', 'Dif');
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->add_item('');
+$target = $this->buildTarget('W', 'MR');
+$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
+$objTable->generate_line('');
+
 $objTable->add_item('Miles');
 $target = $this->buildTarget('M', 'Dif');
 $objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
 $target = $this->buildTarget('M', 'W');
 $objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$target = $this->buildTarget('M', 'L');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$target = $this->buildTarget('M', 'P');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$objTable->generate_line('');
-
-$objTable->add_item('Pace');
-$target = $this->buildTarget('P', 'Dif');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$target = $this->buildTarget('P', 'W');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$target = $this->buildTarget('P', 'L');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$objTable->add_item('' . " ");
-$objTable->generate_line('');
-
-$objTable->add_item('Grade');
-$target = $this->buildTarget('L', 'Dif');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$target = $this->buildTarget('L', 'W');
-$objTable->add_item($toolsHelper->imageButton('I', $target, False, "link-button button-p5565") . " ");
-$objTable->add_item('' . " ");
-$objTable->add_item('' . " ");
+$objTable->add_item('');
 $objTable->generate_line('');
 
 $objTable->generate_table();
@@ -125,17 +108,14 @@ echo '<h4>Other analyses</h4>';
 $target = $this->buildTarget('Y', 'YM');
 echo 'Year/Month ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
 
-if ($this->scope == "A") {              // Future walks
-    $target = $this->buildTarget('G', 'S');
-    echo 'Group/Status ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
-}
-//$target = $this->buildTarget('M', 'G');
-//echo 'Miles/Group ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
-
-$target = "index.php?option=com_ra_walks&task=reports.showTopLeaders&mode=G&opt=" . $this->group_code . '&scope=' . $this->scope;
-$target .= '&callback=reports_group';
-echo 'Top walk leaders ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
-
+//if ($this->scope == "A") {              // Future walks
+//    $target = $this->buildTarget('G', 'S');
+//    echo 'Group/Status ' . $toolsHelper->imageButton('I', $target, false, "link-button button-p5565") . '<br>';
+//}
+$target_reports = 'index.php?option=com_ra_walks&limit=20&mode=G&invoked_by=reports_group';
+$target_reports .= '&opt=' . $this->group_code;
+$target_reports .= '&scope=' . $this->scope . '&task=reports.';
+echo 'Top walk leaders ' . $toolsHelper->imageButton('I', $target_reports . 'showTopLeaders', false, "link-button button-p5565") . '<br>';
 /*
   Following reports require ra_snapshot and ra_group_audit respectively
  *
@@ -147,15 +127,11 @@ echo 'Top walk leaders ' . $toolsHelper->imageButton('I', $target, false, "link-
  */
 
 
-// This is usually invoked from view=raports_area, but it can also be invoked from
-// showTopGroups. In the case, callback will have been set up
-if (!$this->callback == '') {
-    $target = $this->callback;
-} else {
-    $target = "index.php?option=com_ra_walks&view=group_list";
+// This is usually invoked from view=reports_area, but it can also be invoked from
+// a menu, or from showTopGroups.
+if ($this->back != '') {
+    echo $toolsHelper->backButton($this->back);
 }
-echo $toolsHelper->backButton($target);
-
 echo '<p class="text-highlight">';
 echo '"DOW" = Day of week';
 echo ', ' . '"Grade" = Local grade' . PHP_EOL;

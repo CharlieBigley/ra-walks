@@ -1,6 +1,6 @@
 <?php
 /**
- * @version    1.0.0
+ * @version    1.1.2
  * @package    com_ra_walks
  * @author     Charlie Bigley <webmaster@bigley.me.uk>
  * @copyright  2023 Charlie Bigley
@@ -58,7 +58,7 @@ $isSuperuser = $toolsHelper->isSuperuser();
 $details = $walk_id;
 if ($days_to_go > 0) {
     // If the walk has not yet taken place, show the content of the JSON feed
-    $details .= $JsonHelper->showWalk($this->item->walk_id);
+//    $details .= $JsonHelper->showWalk($this->item->walk_id);
 }
 if ($isSuperuser) {
     $details .= " (internal id=" . $this->item->id . ")";
@@ -194,6 +194,11 @@ $details .= $this->item->distance_km . " km";
 $objTable->add_item($details);
 $objTable->generate_line();
 
+$objTable->add_item("Difficulty ");
+$details = $this->item->difficulty;
+$objTable->add_item($details);
+$objTable->generate_line();
+
 $details = $this->item->ascent_feet;
 if ($details != "") {
     $objTable->add_item("Ascent ");
@@ -205,7 +210,7 @@ if ($details != "") {
 
 $details = $this->item->finish_time;
 if ($details != "") {
-    $objTable->add_item("Finish time ");
+    $objTable->add_item("Est. finish time ");
     $objTable->add_item($details);
     $objTable->generate_line();
 }
@@ -254,7 +259,8 @@ $canCheckin = Factory::getApplication()->getIdentity()->authorise('core.manage',
 if ($this->callback == 'walks') {
     $back = 'index.php?option=com_ra_walks&view=walks';
 } else {
+    $back = 'index.php?option=com_ra_walks&view=reports_matrix&report_type=L&invoked_by=walk';
 //  the return destination may have been set up in user state
-    $back = Factory::getApplication()->getUserState('com_ra_walks.callback_list', '');
+//    $back = Factory::getApplication()->getUserState('com_ra_walks.callback_list', '');
 }
 echo $toolsHelper->backButton($back);

@@ -17,6 +17,7 @@
                                 name="area" 
                                 type="text" 
                                 label="Area code" 
+                                showon="type:specified"
                                 description="Two character Area code" />                 
 			</fieldset>
 		</fields>

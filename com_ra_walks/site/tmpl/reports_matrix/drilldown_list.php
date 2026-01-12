@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @version     1.1.0
+ * @version     1.1.2
  * @package     com_ra_walks
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
@@ -9,7 +9,7 @@
  * Usually this is invoked from view reports_matrix (template reports_matrix.php), and therefore that is the target of the "Back" button.
 
   However, it can also be invoked from other reports, for example reports_statistics.php.
- * In such cases, the parameters being passed will include "callback",
+ * In such cases, the parameters being passed will include "invoked_by",
  * so $this->callback will contain the appropriate URL.
  * 13/05/21 created
  * 10/06/21 Different code if invoked from showTopDistance
@@ -129,12 +129,5 @@ try {
     JFactory::getApplication()->enqueueMessage($code . ' ' . $e->getMessage(), 'error');
     JFactory::getApplication()->enqueueMessage($db->replacePrefix($query));
 }
-if (!$this->callback == '') {
-    $back = 'index.php?option=com_ra_walks&view=' . $this->callback;
-} else {
-    // All the required parameters will have been saved in the user state
-    $back = 'index.php?option=com_ra_walks&view=reports_matrix';
-}
-
-echo $toolsHelper->backButton($back);
+echo $toolsHelper->backButton($this->back);
 ?>

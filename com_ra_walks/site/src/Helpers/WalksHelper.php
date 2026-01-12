@@ -3,6 +3,7 @@
 /**
  * Common functions to support Walks
  *
+ * @version     1.1.2
  * @author charles
  *  * 06/12/22 CB created from com_ramblers
  * 07/12/22 CB use $this->buildLink
@@ -808,6 +809,63 @@ class WalksHelper {
                 $this->sendMessageSingle("N", $row->id);
             }
         }
+    }
+
+    static function selectLimit($limit, $target) {
+// Generate a drop down list of integers for Limit
+// When an item is selected from the list, a Javascript function will be invoked
+// to pass control the the URL specified in $target
+
+        $options[] = 10;
+        $options[] = 20;
+        $options[] = 30;
+        $options[] = 50;
+        $options[] = 100;
+
+        echo 'Limit: <select id=selectLimit name=limit onChange="changeLimit(' . chr(39) . $target . chr(39) . ')">';
+        for ($i = 0; $i < 5; $i++) {
+            echo '<option value=' . $options[$i];
+            if ($options[$i] == $limit) {
+                echo ' selected';
+            }
+            echo '>' . $options[$i];
+            echo '</option>';
+        }
+        echo '</select> ';
+    }
+
+    static function selectScope($scope, $target) {
+// Generate a drop down list, but ensure the current state is listed first
+// Overly complicated - could use select to specify current seleted option
+        switch ($scope) {
+            case ($scope == 'F');
+                $options = 'FHAD';
+                break;
+            case ($scope == 'H');
+                $options = 'HFAD';
+                break;
+            case ($scope == 'D');
+                $options = 'DFHA';
+                break;
+            default;
+                $options = 'AFHD';
+        }
+
+        echo 'Scope: <select id=selectScope name=scope onChange="changeScope(' . chr(39) . $target . chr(39) . ')">';
+        for ($i = 0; $i < 4; $i++) {
+            echo '<option value=' . substr($options, $i, 1) . '>';
+            if (substr($options, $i, 1) == "F") {              // Future walks
+                echo 'Future walks';
+            } elseif (substr($options, $i, 1) == "H") {   // Historic
+                echo 'Past walks';
+            } elseif (substr($options, $i, 1) == "D") {   // Draft/ Cancelled/Archived
+                echo 'Draft/Cancelled walks';
+            } else {
+                echo 'All walks';
+            }
+            echo '</option>';
+        }
+        echo '</select>';
     }
 
     function sendEmail($to_email, $subject, $email_body) {

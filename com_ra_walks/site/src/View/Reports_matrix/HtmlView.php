@@ -1,14 +1,27 @@
 <?php
 
 /**
- * @version     4.0.12
+ * @version     1.1.3
  * @package     com_ra_walks(Ramblers Walks)
  * @copyright   Copyright (C) 2020. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  * @author      Charlie <webmaster@bigley.me.uk> - https://www.stokeandnewcastleramblers.org.uk
  *
+ *  *
+ *  This program can be called in two ways:
+
+ *  1 From a superior menu
+ *  2 From a subordinate program, following it's invocation from here.
+ *
+ *  In the first case,
+ *      this could be from reports_area, reports_group, list_areas or list_groups
+ *      the parameters are stored in the user-state for later retrieval.
+ *  In the second case, the parameter "invoked_by" will be set to Y, and the
+ *      required parameters are retrieved from the user-state.
+ *
  * 07/08/23 CB Created for V4
  * 22/01/24 CB eliminate JText
+ * 09/01/26 CB use DAYOFWEEK, not DAYNAME
  */
 
 namespace Ramblers\Component\Ra_walks\Site\View\Reports_matrix;
@@ -31,7 +44,7 @@ class HtmlView extends BaseHtmlView {
     protected $item;
     protected $component_params;
 // fields used by all templates
-    protected $callback;
+    protected $back;
     protected $limit;
     protected $mode;
     protected $opt;
@@ -53,31 +66,92 @@ class HtmlView extends BaseHtmlView {
         $toolsHelper = new ToolsHelper;
         $app = Factory::getApplication();
         //        $app->input->set('tmpl', 'component');
-//
         $this->component_params = $app->getParams();
-        // get the input parameters
-        $this->row = substr($app->input->getCmd('row', ''), 0, 2);
-        $this->row_value = ToolsHelper::convert_from_ASCII($app->input->getCmd('row_value', ''));
-        $this->col = $app->input->getCmd('col', '');
-        $this->col_value = ToolsHelper::convert_from_ASCII($app->input->getCmd('col_value', ''));
-        $this->report_type = $app->input->getCmd('report_type', '');
-        $this->limit = $app->input->getCmd('limit', '20');
-        $this->sort = $app->input->getCmd('sort', 'M');
+        $this->scope = substr($app->input->getCmd('scope', 'F'), 0, 1);
+        // invoked_by will be blank if called from a superior program
+        $invoked_by = $app->input->getCmd('invoked_by', '');
 
-        // Ensure that when drilldown programs have finished, returning here will restore the
-        // original set of parameters
         $context = 'com_ra_walks.reports.';
-        $this->mode = $app->getUserState($context . 'mode');
-        $this->opt = $app->getUserState($context . 'opt');
-        $this->scope = $app->getUserState($context . 'scope');
-        $this->row = $app->getUserState($context . 'row');
-        $this->col = $app->getUserState($context . 'col');
-        echo "report_type: $this->report_type<br>";
-        echo "mode: $this->mode<br>";
-        echo "opt: $this->opt<br>";
-        echo "scope: $this->scope<br>";
-        echo "row: $this->row<br>";
-        echo "col: $this->col<br>";
+        if (($invoked_by == 'reports_area') or ($invoked_by == 'reports_group')) {
+            //           $this->back = 'index.php?option=com_ra_walks&invoked_by=reports_matrix&view=' . $invoked_by . '&scope=';
+            $this->mode = $app->input->getCmd('mode', 'A');
+            $this->opt = $app->input->getCmd('opt', 'NS01');
+            $this->report_type = $app->input->getCmd('report_type', '');
+            $this->row = $app->input->getCmd('row', '');
+            $this->row_value = ToolsHelper::convert_from_ASCII($app->input->getCmd('row_value', ''));
+            $this->col = $app->input->getCmd('col', '');
+            $this->col_value = ToolsHelper::convert_from_ASCII($app->input->getCmd('col_value', ''));
+            $this->limit = $app->input->getCmd('limit', '20');
+            $this->sort = $app->input->getCmd('sort', 'M');
+
+            // Save values for later retrieval
+            $app->setUserState($context . 'mode', $this->mode);
+            $app->setUserState($context . 'opt', $this->opt);
+//            $app->setUserState($context . 'scope', $this->scope);
+            $app->setUserState($context . 'report_type', $this->report_type);
+            $app->setUserState($context . 'row', $this->row);
+            $app->setUserState($context . 'col', $this->col);
+            // 31/12/25 These may not actually be used here
+            $app->setUserState($context . 'limit', $this->limit);
+            $app->setUserState($context . 'sort', $this->sort);
+        } elseif (($invoked_by == 'self') OR ($invoked_by == 'walk')) {
+            // These values taken from the previously saved values
+            $this->mode = $app->getUserState($context . 'mode');
+            $this->opt = $app->getUserState($context . 'opt');
+//            $this->scope = $app->getUserState($context . 'scope');
+            $this->row = $app->getUserState($context . 'row');
+            $this->col = $app->getUserState($context . 'col');
+            // Report type will always be L?
+            $this->report_type = $app->input->getCmd('report_type', '');
+            if ($invoked_by == 'self') {
+                // This values will be passed explicitely
+                //               echo 'row value ' . $app->input->getCmd('row_value', '') . '<br>';
+                $this->row_value = ToolsHelper::convert_from_ASCII($app->input->getCmd('row_value', ''));
+                $this->col_value = ToolsHelper::convert_from_ASCII($app->input->getCmd('col_value', ''));
+                $app->setUserState($context . 'row_value', $this->row_value);
+                $app->setUserState($context . 'col_value', $this->col_value);
+            } else {
+                $this->row_value = $app->getUserState($context . 'row_value');
+                $this->col_value = $app->getUserState($context . 'col_value');
+            }
+        } else {
+            $this->report_type = $app->input->getCmd('report_type', '');
+            // Retrieve parameters from the user state
+            // get the input parameters
+            $this->mode = $app->getUserState($context . 'mode');
+            $this->opt = $app->getUserState($context . 'opt');
+//            $this->scope = $app->getUserState($context . 'scope');
+            $this->row = $app->getUserState($context . 'row');
+            $this->row_value = $app->getUserState($context . 'row_value');
+            $this->col = $app->getUserState($context . 'col');
+            $this->col_value = $app->getUserState($context . 'col_value');
+            $this->limit = $app->getUserState($context . 'limit');
+            $this->sort = $app->getUserState($context . 'sort');
+        }
+
+        $this->back = "index.php?option=com_ra_walks&view=";
+        if ($invoked_by == 'self') {
+            $this->back .= 'reports_matrix';
+        } else {
+            if ($this->mode == 'A') {
+                $this->back .= 'reports_area';
+            } else {
+                $this->back .= 'reports_group';
+            }
+        }
+        $this->back .= '&invoked_by=reports_matrix&scope=';
+        if (JDEBUG) {
+            echo "View: reports_matrix<br>";
+            echo "<b>reports_matrix</b> invoked_by: $invoked_by<br>";
+            echo "mode: $this->mode<br>";
+            echo "opt: $this->opt<br>";
+            echo "scope: $this->scope<br>";
+            echo "report_type: $this->report_type<br>";
+            echo "row: $this->row<br>";
+            echo "row_value: $this->row_value<br>";
+            echo "col: $this->col<br>";
+            echo "col_value: $this->col_value<br>";
+        }
 
         $this->criteria_sql = '';
         switch ($this->mode) {
@@ -91,10 +165,10 @@ class HtmlView extends BaseHtmlView {
                     }
                 }
                 break;
-            //            case ($this->mode == 'A2');
-            //                // we are finding walks for a given Area
-            //                $this->criteria = 'Group';
-            //                break;
+//            case ($this->mode == 'A2');
+//                // we are finding walks for a given Area
+//                $this->criteria = 'Group';
+//                break;
             case ($this->mode == "Dif");
                 $this->criteria_sql = "walks.difficulty='" . $this->opt . "' ";
                 $this->criteria = "Difficulty=$this->opt";
@@ -102,10 +176,6 @@ class HtmlView extends BaseHtmlView {
             case ($this->mode == "G");
                 $this->criteria_sql = "walks.group_code='" . $this->opt . "' ";
                 $this->criteria = "Group=" . $toolsHelper->getValue("SELECT name FROM #__ra_groups where code='" . $this->opt . "' ");
-                break;
-            case ($this->mode == "L");
-                $this->criteria_sql = "walks.local_grade='" . $this->opt . "' ";
-                $this->criteria = "Local grade=$this->opt";
                 break;
             case ($this->mode == "M");
                 $this->criteria_sql = "walks.distance_miles='" . $this->opt . "' ";
@@ -115,12 +185,8 @@ class HtmlView extends BaseHtmlView {
                 $this->criteria_sql = "ROUND(walks.distance_miles)='" . $this->opt . "' ";
                 $this->criteria = "Miles (rounded)=$this->opt";
                 break;
-            case ($this->mode == "P");
-                $this->criteria_sql = "walks.pace='" . $this->opt . "' ";
-                $this->criteria = "Pace=$this->opt";
-                break;
             case ($this->mode == "W");
-                $this->criteria_sql = "dayname(walk_date)='" . $this->opt . "' ";
+                $this->criteria_sql = "DAYNAME(walk_date)='" . $this->opt . "' ";
                 $this->criteria = "Weekday=$this->opt";
                 break;
             case ($this->mode == "WL");
@@ -129,6 +195,7 @@ class HtmlView extends BaseHtmlView {
                 $this->criteria = "Leader=$opt";
                 break;
             default;
+                echo 'mode ' . $this->mode . ' unknown<br>';
                 Factory::getApplication()->enqueueMessage('mode ' . $this->mode . ' unknown', 'message');
                 $error = 1;
         }
@@ -150,10 +217,6 @@ class HtmlView extends BaseHtmlView {
                 $this->row_field = 'difficulty';
                 $this->row_group_by = "GROUP BY difficulty ORDER BY difficulty";
                 break;
-            case ($this->row == "L");
-                $this->row_type = "Local grade";
-                $this->row_field = "grade_local";
-                break;
             case ($this->row == "M");
                 $this->row_type = "Miles";
                 $this->row_field = "distance_miles";
@@ -161,10 +224,6 @@ class HtmlView extends BaseHtmlView {
             case ($this->row == "MR");
                 $this->row_type = "Miles (rounded)";
                 $this->row_field = "ROUND(distance_miles)";
-                break;
-            case ($this->row == "P");
-                $this->row_type = "Pace";
-                $this->row_field = "pace";
                 break;
             case ($this->row == "W");
                 $this->row_type = "Weekday";
@@ -214,11 +273,11 @@ class HtmlView extends BaseHtmlView {
                 break;
             case ($this->col == "S");
                 $this->col_type = "Status";
-                $this->col_field = 'state';
+                $this->col_field = 'walks.state';
                 break;
             case ($this->col == "W");
                 $this->col_type = "Weekday";
-                $this->col_field = "DAYOFWEEK(walk_date)";
+                $this->col_field = "DAYNAME(walk_date)";
                 break;
             case ($this->col == "YM");
                 $this->col_type = "Month";
@@ -250,11 +309,8 @@ class HtmlView extends BaseHtmlView {
 
         $this->prepareDocument();
 
-        if ($this->report_type == 'C') {
-            parent::SetLayout('tmpl:drilldown_csv');
-            $callback_key = 'com_ra_walks.callback_csv';
-        } elseif ($this->report_type == 'L') {
-            parent::SetLayout('tmpl:drilldown_list');
+        if ($this->report_type == 'L') {
+            parent::SetLayout('tmpl:list');
             $callback_key = 'com_ra_walks.callback_list';
         } else {
             parent::SetLayout('tmpl:drilldown_matrix');

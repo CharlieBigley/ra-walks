@@ -1,12 +1,13 @@
 <?php
 
 /*
- * @version    1.1.0
+ * @version    1.1.2
  * @component  com_ra_walks
  * @author     Charlie Bigley <webmaster@bigley.me.uk>
  * @copyright  2023 Charlie Bigley
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  * 19/02/25 CB copied from com_ra_tools
+ * 24/12/25 CB change callback to invoked_by
  */
 defined('_JEXEC') or die;
 
@@ -22,8 +23,8 @@ $toolsHelper = new ToolsHelper;
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 
-$target_reports = 'index.php?option=com_ra_walks&view=reports_group&group_code=';
-$target_reports .= '&callback=' . Toolshelper::convert_to_ASCII('index.php?option=com_ra_walks&view=group_list');
+$target_reports = 'index.php?option=com_ra_walks&view=reports_group&invoked_by=group_list';
+$target_reports .= '&scope=A&group_code=';
 $target_radius = 'index.php?option=com_ra_tools&view=programme&layout=radius&group=';
 
 // See if Walks Follow has been installed
@@ -102,7 +103,7 @@ if (empty($this->items)) {
             $sql .= "Where walks.group_code='" . $item->code . "'";
             $count_walks = $toolsHelper->getValue($sql);
             if ($count_walks > 0) {
-                echo $count_walks . $toolsHelper->imageButton("I", $target_reports . "&scope=A&group_code=" . $item->code);
+                echo $count_walks . $toolsHelper->imageButton("I", $target_reports . $item->code);
             }
             echo "</td>";
 
