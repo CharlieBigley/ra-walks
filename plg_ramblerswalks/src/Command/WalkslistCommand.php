@@ -55,6 +55,7 @@ class WalkslistCommand extends AbstractCommand {
      * @since 4.0.0
      */
     private $ioStyle;
+    protected $db;
     private $toolsHelper;
 
     /**
@@ -64,6 +65,8 @@ class WalkslistCommand extends AbstractCommand {
      */
     public function __construct() {
         parent::__construct();
+        $this->db = Factory::getDbo();
+        $this->toolsHelper = new ToolsHelper;
     }
 
     /**
@@ -97,7 +100,6 @@ class WalkslistCommand extends AbstractCommand {
 
         $this->setDescription('Called by cron to list summary of walks.');
         $this->setHelp($help);
-        $this->toolsHelper = new ToolsHelper;
     }
 
     /**
@@ -113,25 +115,43 @@ class WalkslistCommand extends AbstractCommand {
     protected function doExecute(InputInterface $input, OutputInterface $output): int {
         $this->configureIO($input, $output);
 
+        $stats = [];
+
         $sql = 'SELECT COUNT(id) FROM #__ra_walks';
-        $this->ioStyle->comment("Total number of walks is " . number_format($this->toolsHelper->getValue($sql)));
-        $body = "Total number of walks is " . number_format($this->toolsHelper->getValue($sql)) . '<br>';
+        $stats['total_walks'] = (int) $this->toolsHelper->getValue($sql);
+        $this->ioStyle->comment("Total number of walks is " . number_format($stats['total_walks']));
+        $body = "Total number of walks is " . number_format($stats['total_walks']) . '<br>';
 
         $sql = 'SELECT COUNT(id) FROM #__ra_walks WHERE state=1';
-        $this->ioStyle->comment("Total number of published walks is " . number_format($this->toolsHelper->getValue($sql)));
-        $body .= "Total number of published walks is " . number_format($this->toolsHelper->getValue($sql)) . '<br>';
+        $stats['published_walks'] = (int) $this->toolsHelper->getValue($sql);
+        $this->ioStyle->comment("Total number of published walks is " . number_format($stats['published_walks']));
+        $body .= "Total number of published walks is " . number_format($stats['published_walks']) . '<br>';
 
         $sql = 'SELECT COUNT(id) FROM #__ra_walks WHERE state=0';
-        $this->ioStyle->comment("Total number of unpublished walks is " . number_format($this->toolsHelper->getValue($sql)));
-        $body .= "Total number of unpublished walks is " . number_format($this->toolsHelper->getValue($sql)) . '<br>';
+        $stats['unpublished_walks'] = (int) $this->toolsHelper->getValue($sql);
+        $this->ioStyle->comment("Total number of unpublished walks is " . number_format($stats['unpublished_walks']));
+        $body .= "Total number of unpublished walks is " . number_format($stats['unpublished_walks']) . '<br>';
 
         $sql = 'SELECT MIN(walk_date) FROM #__ra_walks';
-        $this->ioStyle->comment("Earliest walk is for " . $this->toolsHelper->getValue($sql));
-        $body .= "Earliest walk is for " . $this->toolsHelper->getValue($sql) . '<br>';
+        $stats['earliest_walk_date'] = $this->toolsHelper->getValue($sql);
+        $this->ioStyle->comment("Earliest walk is for " . $stats['earliest_walk_date']);
+        $body .= "Earliest walk is for " . $stats['earliest_walk_date'] . '<br>';
 
         $sql = 'SELECT MAX(walk_date) FROM #__ra_walks';
-        $this->ioStyle->comment("Latest walk is for " . $this->toolsHelper->getValue($sql));
-        $body .= "Latest walk is for " . $this->toolsHelper->getValue($sql) . '<br>';
+        $stats['latest_walk_date'] = $this->toolsHelper->getValue($sql);
+        $this->ioStyle->comment("Latest walk is for " . $stats['latest_walk_date']);
+        $body .= "Latest walk is for " . $stats['latest_walk_date'] . '<br>';
+
+        $query = $this->db->getQuery(true)
+                ->insert('#__ra_walk_stats')
+                ->set('report_date = ' . $this->db->quote(Factory::getDate()->toSql()))
+                ->set('total_walks = ' . $stats['total_walks'])
+                ->set('published_walks = ' . $stats['published_walks'])
+                ->set('unpublished_walks = ' . $stats['unpublished_walks'])
+                ->set('earliest_walk_date = ' . ($stats['earliest_walk_date'] ? $this->db->quote($stats['earliest_walk_date']) : 'NULL'))
+                ->set('latest_walk_date = ' . ($stats['latest_walk_date'] ? $this->db->quote($stats['latest_walk_date']) : 'NULL'));
+
+        $this->db->setQuery($query)->execute();
 
         $this->ioStyle->comment($body);
         /*
@@ -148,8 +168,6 @@ class WalkslistCommand extends AbstractCommand {
         $toolsHelper = new ToolsHelper;
 
         return $toolsHelper->sendEmail($to, $reply_to, $title, $body);
-
-        return 1;
     }
 
 }
