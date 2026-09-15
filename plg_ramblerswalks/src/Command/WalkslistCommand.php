@@ -12,6 +12,7 @@
  * 23/12/24 CB use this->toolsHelper
  * 06/01/25 CB send result as email
  * 07/01/25 CB add dependencies
+ * 15/08/26 CB Store statistics 
  */
 
 namespace Ramblers\Plugin\System\Ramblerswalks\Command;
